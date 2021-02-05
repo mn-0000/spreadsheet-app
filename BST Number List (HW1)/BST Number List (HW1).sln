@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BST Number List (HW1)", "BST Number List (HW1)\BST Number List (HW1).csproj", "{C37F1825-962B-4453-AFAF-0EFE4B4AC8DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HW1", "BST Number List (HW1)\HW1.csproj", "{C37F1825-962B-4453-AFAF-0EFE4B4AC8DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
