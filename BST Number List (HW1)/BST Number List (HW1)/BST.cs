@@ -52,13 +52,13 @@ namespace HW1
             return new Node(value);
         }
 
-        public static void PrintSortedBST(Node root)
+        public static void PrintSortedBST(Node node)
         {
-            if (root != null)
+            if (node != null)
             {
-                PrintSortedBST(root.left);
-                Console.Write("{0} ", root.data);
-                PrintSortedBST(root.right);
+                PrintSortedBST(node.left);
+                Console.Write("{0} ", node.data);
+                PrintSortedBST(node.right);
             } 
             else
             {
@@ -71,11 +71,11 @@ namespace HW1
             PrintSortedBST(root);
         }
 
-        public int Count(Node root)
+        public int Count(Node node)
         {
-            if (root != null)
+            if (node != null)
             {
-                return 1 + Count(root.left) + Count(root.right);
+                return 1 + Count(node.left) + Count(node.right);
             }
             return 0;
         }
@@ -85,11 +85,11 @@ namespace HW1
             return Count(root);
         }
 
-        public int Height(Node root)
+        public int Height(Node node)
         {
-            if (root != null)
+            if (node != null)
             {
-                return Math.Max(Height(root.left), Height(root.right));
+                return 1 + Math.Max(Height(node.left), Height(node.right));
             }
             return 0;
         }

@@ -44,6 +44,7 @@ namespace HW1
             Console.WriteLine(sortedCollection.Height());
             Console.Write("    Minimum number of levels for a tree with " + numberOfElements + " nodes: ");
             Console.WriteLine(1 + Math.Floor(Math.Log(numberOfElements, 2)));
+
             Console.WriteLine("Program finished. Press Enter to exit.");
             Console.ReadLine();
             
