@@ -33,11 +33,20 @@ namespace HW1
                 sortedCollection.Insert(number);
             }
 
+            Console.Write("The elements in the tree are: ");
             BinarySearchTree.PrintSortedBST();
+
+            Console.WriteLine("\nTree statistics:");
+            Console.Write("    Number of elements: ");
+            int numberOfElements = sortedCollection.Count();
+            Console.WriteLine(numberOfElements);
+            Console.Write("    Number of levels: ");
+            Console.WriteLine(sortedCollection.Height());
+            Console.Write("    Minimum number of levels for a tree with " + numberOfElements + " nodes: ");
+            Console.WriteLine(1 + Math.Floor(Math.Log(numberOfElements, 2)));
             Console.WriteLine("Program finished. Press Enter to exit.");
             Console.ReadLine();
+            
         }
-
-
     }
 }

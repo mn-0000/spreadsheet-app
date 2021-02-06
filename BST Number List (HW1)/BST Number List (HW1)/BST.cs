@@ -70,5 +70,33 @@ namespace HW1
         {
             PrintSortedBST(root);
         }
+
+        public int Count(Node root)
+        {
+            if (root != null)
+            {
+                return 1 + Count(root.left) + Count(root.right);
+            }
+            return 0;
+        }
+
+        public int Count()
+        {
+            return Count(root);
+        }
+
+        public int Height(Node root)
+        {
+            if (root != null)
+            {
+                return Math.Max(Height(root.left), Height(root.right));
+            }
+            return 0;
+        }
+
+        public int Height()
+        {
+            return Height(root);
+        }
     }
 }
