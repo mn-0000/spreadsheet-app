@@ -1,17 +1,14 @@
 ﻿using System;
-using BST_Number_List__HW1_;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace HW1
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-
-        static void Main()
+        public static void Main()
         {
             Console.WriteLine("Enter a collection of unique numbers in the range [0, 100], separated by spaces: ");
             string userInput = Console.ReadLine();
@@ -35,7 +32,6 @@ namespace HW1
 
             Console.Write("The elements in the tree are: ");
             BinarySearchTree.PrintSortedBST();
-
             Console.WriteLine("\nTree statistics:");
             Console.Write("    Number of elements: ");
             int numberOfElements = sortedCollection.Count();
@@ -47,7 +43,6 @@ namespace HW1
 
             Console.WriteLine("Program finished. Press Enter to exit.");
             Console.ReadLine();
-            
         }
     }
 }

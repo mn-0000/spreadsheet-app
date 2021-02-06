@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HW1;
+
 
 namespace HW1
 {
@@ -19,7 +15,6 @@ namespace HW1
             }
             else
             {
-                // Locate the parent node
                 Node parent = null;
                 Node current = root;
                 while (current != null)
@@ -35,6 +30,7 @@ namespace HW1
                         current = current.right;
                     }
                 }
+
                 // Create the new node and attach it to the parent node
                 if (value < parent.data)
                 {
@@ -59,7 +55,7 @@ namespace HW1
                 PrintSortedBST(node.left);
                 Console.Write("{0} ", node.data);
                 PrintSortedBST(node.right);
-            } 
+            }
             else
             {
                 return;
