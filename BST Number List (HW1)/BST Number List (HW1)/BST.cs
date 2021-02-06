@@ -1,12 +1,15 @@
 ﻿using System;
 
-
 namespace HW1
 {
     public class BinarySearchTree
     {
         static Node root;
 
+        /// <summary>
+        /// Inserts a given value into the BST.
+        /// </summary>
+        /// <param name="value"></param>
         public void Insert(int value)
         {
             if (root == null)
@@ -31,7 +34,7 @@ namespace HW1
                     }
                 }
 
-                // Create the new node and attach it to the parent node
+                // Create new node and attach it to the parent node
                 if (value < parent.data)
                 {
                     parent.left = CreateNewNode(value);
@@ -43,11 +46,20 @@ namespace HW1
             }
         }
 
+        /// <summary>
+        /// Creates a new node for the BST given a certain value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns> New node </returns>
         private Node CreateNewNode(int value)
         {
             return new Node(value);
         }
 
+        /// <summary>
+        /// Prints all elements of the BST sorted from lowest to highest value.
+        /// </summary>
+        /// <param name="node"></param>
         public static void PrintSortedBST(Node node)
         {
             if (node != null)
@@ -62,11 +74,19 @@ namespace HW1
             }
         }
 
+        /// <summary>
+        /// Overload method for the PrintSortedBST method so that it can be called from Main().
+        /// </summary>
         public static void PrintSortedBST()
         {
             PrintSortedBST(root);
         }
 
+        /// <summary>
+        /// Determines the number of elements in the BST.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns> number of elements in BST </returns>
         public int Count(Node node)
         {
             if (node != null)
@@ -76,23 +96,34 @@ namespace HW1
             return 0;
         }
 
+        /// <summary>
+        /// Overload method for the Count method so that it can be called from Main().
+        /// </summary>
         public int Count()
         {
             return Count(root);
         }
 
-        public int Height(Node node)
+        /// <summary>
+        /// Determine the number of levels of the BST.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns> number of levels </returns>
+        public int DetermineLevel(Node node)
         {
             if (node != null)
             {
-                return 1 + Math.Max(Height(node.left), Height(node.right));
+                return 1 + Math.Max(DetermineLevel(node.left), DetermineLevel(node.right));
             }
             return 0;
         }
 
-        public int Height()
+        /// <summary>
+        /// Overload method for the DetermineLevel method so that it can be called from Main().
+        /// </summary>
+        public int DetermineLevel()
         {
-            return Height(root);
+            return DetermineLevel(root);
         }
     }
 }

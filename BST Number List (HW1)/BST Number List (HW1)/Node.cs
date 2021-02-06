@@ -7,7 +7,10 @@ namespace HW1
         public Node left;
         public Node right;
 
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="data"></param>
         public Node(int data)
         {
             this.data = data;
