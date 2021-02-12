@@ -21,14 +21,23 @@ namespace HW2
         {
             Random rand = new Random();
             List<int> randomNumbers = new List<int>(10000);
+            HashSet<int> set = new HashSet<int>();
             Enumerable.Range(0, 20000);
             int number;
             for (int i = 0; i < 10000; i++)
             {
                 number = rand.Next(0, 20000);
                 randomNumbers.Add(number);
+                
             }
-            textBox1.Text = string.Join(" ", randomNumbers);
+
+            RemoveDuplicates<int>(randomNumbers);
+
+        }
+
+        public static List<T> RemoveDuplicates<T>(List<T> list)
+        {
+            return new HashSet<T>(list).ToList();
         }
     }
 }
