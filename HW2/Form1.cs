@@ -68,7 +68,7 @@ namespace HW2
             for (int i = 0; i < list.Count; i++)
             {
                 bool isDuplicate = false;
-                // Traverse through the list up to the element preceding i.
+                // Traverse through the list up to the element preceding list[i].
                 // Only the first instance of the element would be added to the new list, all other instances will be skipped.
                 for (int j = 0; j < i; j++)
                 {
