@@ -39,14 +39,14 @@ namespace HW2
             this.textBox1.Location = new System.Drawing.Point(0, 0);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(800, 450);
+            this.textBox1.Size = new System.Drawing.Size(582, 403);
             this.textBox1.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(582, 403);
             this.Controls.Add(this.textBox1);
             this.Name = "Form1";
             this.Text = "Minh The Nguyen - 011741737";

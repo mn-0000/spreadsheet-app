@@ -5,26 +5,35 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace HW2
 {
     [TestFixture]
     public class TestClass
     {
+        private List<int> testSet;
         [SetUp]
-        public void SetUp() {}
-
-        [Test]
-        public void TestDiscreteHashMap()
+        public void SetUp()
         {
-            List<int> testSet = new List<int>();
+            testSet = new List<int>();
             for (int i = 0; i < 10; i++)
             {
                 testSet.Add(i);
             }
             testSet.Add(5);
             testSet.Add(7);
-            Assert.AreEqual(testSet.Distinct(), Form1.RemoveDuplicates<int>(testSet));
-            
+        }
+
+        [Test]
+        public void TestDistinctHashMap()
+        {
+            Assert.AreEqual(testSet.Distinct().Count(), Form1.RemoveDuplicatesHashMap(testSet));
+        }
+
+        [Test]
+        public void TestDistinctO1Auxiliary()
+        {
+            Assert.AreEqual(testSet.Distinct().Count(), Form1.RemoveDuplicatesO1Auxiliary(testSet));
         }
     }
 }
