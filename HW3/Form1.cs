@@ -19,7 +19,7 @@ namespace HW3
 
         private void saveToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
@@ -29,7 +29,7 @@ namespace HW3
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 File.WriteAllText(saveFileDialog.FileName, textBox1.Text);
-                
+
             }
         }
 
@@ -56,6 +56,17 @@ namespace HW3
             }
         }
 
-        
+        private void loadFibonacciNumbersfirst50ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FibonacciTextReader ftr = new FibonacciTextReader(50);
+            textBox1.Text = ftr.ReadToEnd();
+        }
+
+        private void loadFibonacciNumbersfirst100ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FibonacciTextReader ftr = new FibonacciTextReader(100);
+            textBox1.Text = ftr.ReadToEnd();
+        }
+
     }
 }
