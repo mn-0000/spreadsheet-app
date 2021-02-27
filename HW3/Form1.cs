@@ -22,14 +22,15 @@ namespace HW3
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
-            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            saveFileDialog.FilterIndex = 1;
-            saveFileDialog.RestoreDirectory = true;
+            // allows the system to quickly filter .txt files for easier access.
+            // the user can still switch to other file types as they wish.
+            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"; 
+            saveFileDialog.FilterIndex = 1; // defaults selection to .txt file.
+            saveFileDialog.RestoreDirectory = true; // restores the last directory the user have accessed.
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 File.WriteAllText(saveFileDialog.FileName, textBox1.Text);
-
             }
         }
 
@@ -46,7 +47,7 @@ namespace HW3
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    //Get the path of specified file
+                    // Get the path of specified file
                     filePath = openFileDialog.FileName;
                     using (StreamReader sr = new StreamReader(filePath))
                     {
