@@ -11,7 +11,7 @@ namespace CptS321.Tests
     public class TestClass
     {
         Spreadsheet testSpreadsheet;
-        
+
         [SetUp]
         public void SetUp()
         {
@@ -20,7 +20,7 @@ namespace CptS321.Tests
             for (int i = 0; i < testSpreadsheet.RowCount; i++)
             {
                 for (int j = 0; j < testSpreadsheet.ColumnCount; j++)
-                testSpreadsheet.cellArray[i, j].Text = 10.ToString(); // sets every cell's value to 10.
+                    testSpreadsheet.cellArray[i, j].Text = 10.ToString(); // sets every cell's value to 10.
             }
         }
 
@@ -46,12 +46,34 @@ namespace CptS321.Tests
             Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, "Hello!");
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the cell referenced another value correctly.
+        /// </summary>
         [Test]
         public void TestCellAssignmentValue()
         {
             testSpreadsheet.cellArray[0, 0].Text = "Goodbye!";
             testSpreadsheet.cellArray[0, 1].Text = "=A1";
             Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, "Goodbye!");
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the system throws an exception when a row or column index is out of bounds.
+        /// </summary>
+        [Test]
+        public void TestCellValueOutOfBounds()
+        {
+            Assert.Throws<IndexOutOfRangeException>(() => testSpreadsheet.cellArray[0, 5].Text = "Error!");
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the program notifies user if their input was incorrect.
+        /// </summary>
+        [Test]
+        public void TestReferenceError()
+        {
+            testSpreadsheet.cellArray[0, 3].Text = "=XX99";
+            Assert.AreEqual(testSpreadsheet.cellArray[0, 3].Value, "Invalid reference");
         }
     }
 }
