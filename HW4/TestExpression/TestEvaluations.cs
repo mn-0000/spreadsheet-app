@@ -17,8 +17,8 @@ namespace CptS321.Tests
         [Test]
         public void TestEvaluatePlus()
         {
-            ExpressionTree exp1 = new ExpressionTree("10 + 8");
-            ExpressionTree exp2 = new ExpressionTree("15+ 20+5");
+            ExpressionTree exp1 = new ExpressionTree("10+8");
+            ExpressionTree exp2 = new ExpressionTree("15+20+5");
             ExpressionTree exp3 = new ExpressionTree("hi+10");
             ExpressionTree exp4 = new ExpressionTree("hello+world");
             ExpressionTree exp5 = new ExpressionTree("B3+nice+3");
@@ -36,8 +36,8 @@ namespace CptS321.Tests
         [Test]
         public void TestEvaluateMinus()
         {
-            ExpressionTree exp6 = new ExpressionTree("8 - 3");
-            ExpressionTree exp7 = new ExpressionTree("24 - 5 - 19");
+            ExpressionTree exp6 = new ExpressionTree("8-3");
+            ExpressionTree exp7 = new ExpressionTree("24-5-19");
             ExpressionTree exp8 = new ExpressionTree("16-17");
             ExpressionTree exp9 = new ExpressionTree("hello-world");
             ExpressionTree exp10 = new ExpressionTree("A1-bye-2");
@@ -54,7 +54,7 @@ namespace CptS321.Tests
         /// </summary>
         public void TestUnsupportedOperator()
         {
-            ExpressionTree exp11 = new ExpressionTree("10 % 3");
+            ExpressionTree exp11 = new ExpressionTree("10%3");
             Assert.That(() => exp11, Throws.TypeOf<System.NotSupportedException>());
         }
 
@@ -65,7 +65,7 @@ namespace CptS321.Tests
         public void TestInfinity()
         {
             var halfMaxValue = (double.MaxValue / 2.0).ToString("F", CultureInfo.InvariantCulture);
-            Assert.True(double.IsInfinity(new ExpressionTree($"{halfMaxValue} + {halfMaxValue}").Evaluate()));
+            Assert.True(double.IsInfinity(new ExpressionTree($"{halfMaxValue}+{halfMaxValue}").Evaluate()));
         }
     }
 }
