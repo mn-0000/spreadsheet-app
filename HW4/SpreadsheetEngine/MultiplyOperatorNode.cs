@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the multiply operator.
+    /// </summary>
     public class MultiplyOperatorNode : OperatorNode
     {
         public static char Operator => '*';

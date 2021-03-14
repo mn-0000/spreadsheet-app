@@ -48,6 +48,10 @@ namespace CptS321.Tests
             Assert.AreEqual(-2.0, exp10.Evaluate());
         }
 
+        /// <summary>
+        /// Test method for the ExpressionTree class, which compares the results of the expressions
+        /// with only '*' operators to the expected values.
+        /// </summary>
         [Test]
         public void TestEvaluateMultiply()
         {
@@ -63,6 +67,10 @@ namespace CptS321.Tests
             Assert.AreEqual(0.0, exp15.Evaluate());
         }
 
+        /// <summary>
+        /// Test method for the ExpressionTree class, which compares the results of the expressions
+        /// with only '/' operators to the expected values.
+        /// </summary>
         [Test]
         public void TestEvaluateDivide()
         {
@@ -76,7 +84,7 @@ namespace CptS321.Tests
             Assert.AreEqual(0.625, exp17.Evaluate());
             Assert.AreEqual(0.0, exp18.Evaluate());
             Assert.AreEqual(double.PositiveInfinity, exp19.Evaluate());
-            Assert.AreEqual(double.PositiveInfinity, exp20.Evaluate());
+            Assert.AreEqual(double.NaN, exp20.Evaluate());
             Assert.AreEqual(0.0, exp21.Evaluate());
         }
 
@@ -87,8 +95,8 @@ namespace CptS321.Tests
         [Test]
         public void TestUnsupportedOperator()
         {
-            ExpressionTree exp0 = new ExpressionTree("10%3");
-            Assert.That(() => exp0, Throws.TypeOf<System.NotSupportedException>());
+            ExpressionTree exp0 = new ExpressionTree("10^3");
+            Assert.That(() => exp0.Evaluate(), Throws.TypeOf<System.NotSupportedException>());
         }
 
         /// <summary>
@@ -102,6 +110,10 @@ namespace CptS321.Tests
             Assert.True(double.IsInfinity(new ExpressionTree($"{halfMaxValue}+{halfMaxValue}").Evaluate()));
         }
 
+        /// <summary>
+        /// Test method for the SetVariable method in the ExpressionTree class, which checks if the variable has been
+        /// added to the dictionary and would cause the expression to evaluate to a new result.
+        /// </summary>
         [Test]
         public void TestEvaluationWithVariableSet()
         {
@@ -110,6 +122,10 @@ namespace CptS321.Tests
             Assert.AreEqual(0.25, exp22.Evaluate());
         }
 
+        /// <summary>
+        /// Test method for the SetVariable method in the ExpressionTree class, which checks if the variable dictionary has been
+        /// cleared prior to a new expression creation.
+        /// </summary>
         [Test]
         public void TestEvaluationOverlappingVariables()
         {

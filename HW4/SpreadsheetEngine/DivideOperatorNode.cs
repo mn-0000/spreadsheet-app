@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the divide operator.
+    /// </summary>
     public class DivideOperatorNode : OperatorNode
     {
         public static char Operator => '/';

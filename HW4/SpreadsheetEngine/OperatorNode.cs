@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the operator node.
+    /// </summary>
     public abstract class OperatorNode : ExpressionTreeNode
     {
         public enum Associative

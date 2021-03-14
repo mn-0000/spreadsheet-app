@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the plus operator.
+    /// </summary>
     public class PlusOperatorNode : OperatorNode
     {
         public static char Operator => '+';

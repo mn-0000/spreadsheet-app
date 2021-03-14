@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the minus operator.
+    /// </summary>
     public class MinusOperatorNode : OperatorNode
     {
         public static char Operator => '-';
