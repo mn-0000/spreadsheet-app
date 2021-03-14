@@ -72,7 +72,7 @@ namespace CptS321.Tests
             ExpressionTree exp19 = new ExpressionTree("44/0");
             ExpressionTree exp20 = new ExpressionTree("x/y");
             ExpressionTree exp21 = new ExpressionTree("z/4");
-            Assert.AreEqual(4.5, exp16.Evaluate());
+            Assert.AreEqual(6.5, exp16.Evaluate());
             Assert.AreEqual(0.625, exp17.Evaluate());
             Assert.AreEqual(0.0, exp18.Evaluate());
             Assert.AreEqual(double.PositiveInfinity, exp19.Evaluate());
