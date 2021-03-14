@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
-    class ConstantNode : ExpressionTreeNode
+    public class ConstantNode : ExpressionTreeNode
     {
         private readonly double value;
 

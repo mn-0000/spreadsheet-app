@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
-    class MultiplyOperatorNode : OperatorNode
+    public class MultiplyOperatorNode : OperatorNode
     {
         public static char Operator => '*';
         public static ushort Precedence => 6;

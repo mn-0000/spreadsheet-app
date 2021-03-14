@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
-    class PlusOperatorNode : OperatorNode
+    public class PlusOperatorNode : OperatorNode
     {
         public static char Operator => '+';
         public static ushort Precedence => 7;

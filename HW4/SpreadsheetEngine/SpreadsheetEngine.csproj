@@ -49,8 +49,8 @@
     <Compile Include="ExpressionTreeNode.cs" />
     <Compile Include="MinusOperatorNode.cs" />
     <Compile Include="MultiplyOperatorNode.cs" />
+    <Compile Include="NodeFactory.cs" />
     <Compile Include="OperatorNode.cs" />
-    <Compile Include="OperatorNodeFactory.cs" />
     <Compile Include="PlusOperatorNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spreadsheet.cs" />

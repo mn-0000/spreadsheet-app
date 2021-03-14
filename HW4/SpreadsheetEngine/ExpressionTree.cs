@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
@@ -6,34 +7,21 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
-    public class ExpressionTree : OperatorNodeFactory
+    public class ExpressionTree
     {
+        private string rawExpression;
+        private Dictionary<string, double> variables = new Dictionary<string, double>();
+        
+
         public ExpressionTree(string expression)
         {
-            //string[] parameters = expression.Split(new char[] { '+', '-' });
-            //Stack<char> expressionStack = new Stack<char>();
-            //foreach (char c in expression)
-            //{
-            //    if (!Char.IsLetterOrDigit(c))
-            //    {
-            //        expressionStack.Push(c);
-            //    }
-            //}
-            //foreach (string parameter in parameters)
-            //{
-            //    if (double.TryParse(parameter, out double number))
-            //    {
-            //        new ConstantNode(Convert.ToDouble(parameter));
-            //    }
-            //    else
-            //    {
-            //        new VariableNode(parameter);
-            //    }
-            //}
+            this.rawExpression = expression;
+            
+        }
 
-            //var splitExpression = expression.Split(new char[] { '+', '-' });
-            //foreach (string s in splitExpression) Console.WriteLine(s);
-            ConvertToPostFix(expression);
+        public string RawExpression
+        {
+            get { return rawExpression; }
         }
 
         public void SetVariable(string variableName, double variableValue)
@@ -43,8 +31,34 @@ namespace CptS321
 
         public double Evaluate()
         {
-
-            return 0;
+            string postfixExpression = ConvertToPostFix(rawExpression);
+            Stack<ExpressionTreeNode> nodeStack = new Stack<ExpressionTreeNode>();
+            ConstantNode cNode;
+            VariableNode vNode;
+            OperatorNode oNode;
+            double test = 0;
+            string[] treeComponents = postfixExpression.Split(' ');
+            foreach (string component in treeComponents)
+            {
+                if (double.TryParse(component, out test))
+                {
+                    cNode = CreateConstantNode(Convert.ToDouble(component));
+                    nodeStack.Push(cNode);
+                }
+                else if (!double.TryParse(component, out test) && !"+-*/".Contains(component))
+                {
+                    vNode = CreateVariableNode(component);
+                    nodeStack.Push(vNode);
+                }
+                else
+                {
+                    oNode = CreateOperatorNode(char.Parse(component));
+                    oNode.Right = nodeStack.Pop();
+                    oNode.Left = nodeStack.Pop();
+                    nodeStack.Push(oNode);
+                }
+            }
+            return nodeStack.Peek().Evaluate();
         }
 
         private string ConvertToPostFix(string expression)
@@ -78,6 +92,33 @@ namespace CptS321
                 postfixExpression.Append(" " + operatorStack.Pop());
             }
             return postfixExpression.ToString();
+        }
+
+        private ConstantNode CreateConstantNode(double constant)
+        {
+            return new ConstantNode(constant);
+        }
+
+        private VariableNode CreateVariableNode(string variableName)
+        {
+            return new VariableNode(variableName, ref variables);
+        }
+
+        public OperatorNode CreateOperatorNode(char c)
+        {
+            switch (c)
+            {
+                case '+':
+                    return new PlusOperatorNode();
+                case '-':
+                    return new MinusOperatorNode();
+                case '*':
+                    return new MultiplyOperatorNode();
+                case '/':
+                    return new DivideOperatorNode();
+                default:
+                    throw new NotSupportedException("This operator (" + c + ") is currently not supported");
+            }
         }
 
         private int Precedence(char symbol)

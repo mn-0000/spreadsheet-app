@@ -1,4 +1,5 @@
 ﻿using System;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
-    class VariableNode : ExpressionTreeNode
+    public class VariableNode : ExpressionTreeNode
     {
         private readonly string name;
         private Dictionary<string, double> variables;
@@ -15,6 +16,7 @@ namespace CptS321
         {
             this.name = name;
             this.variables = variables;
+            //variables.Add(name, 0.0);
         }
 
         public override double Evaluate()
@@ -26,5 +28,10 @@ namespace CptS321
             }
             return value;
         }
+
+        //public VariableNode CreateVariableNode(string variableName)
+        //{
+        //    return new VariableNode(variableName, ref variables);
+        //}
     }
 }
