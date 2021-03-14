@@ -54,10 +54,9 @@ namespace CptS321
         /// </summary>
         /// <param name="val"> the value to be set.</param>
         /// <returns> the cell, with its value updated. </returns>
-        internal Cell SetValue(string val)
+        internal void SetValue(string val)
         {
             value = val;
-            return this;
         }
 
         public void OnPropertyChanged([CallerMemberName] string value = "")

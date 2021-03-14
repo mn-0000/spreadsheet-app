@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{15E988FF-3AF0-4D2E-A17B-98BB3DD94074}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpreadsheetEngine</RootNamespace>
-    <AssemblyName>SpreadsheetEngine</AssemblyName>
+    <ProjectGuid>{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ExpressionTreeConsole</RootNamespace>
+    <AssemblyName>ExpressionTreeConsole</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,19 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cell.cs" />
-    <Compile Include="ConcreteCell.cs" />
-    <Compile Include="ConstantNode.cs" />
-    <Compile Include="DivideOperatorNode.cs" />
-    <Compile Include="ExpressionTree.cs" />
-    <Compile Include="ExpressionTreeNode.cs" />
-    <Compile Include="MinusOperatorNode.cs" />
-    <Compile Include="MultiplyOperatorNode.cs" />
-    <Compile Include="OperatorNode.cs" />
-    <Compile Include="PlusOperatorNode.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Spreadsheet.cs" />
-    <Compile Include="VariableNode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpreadsheetEngine\SpreadsheetEngine.csproj">
+      <Project>{15e988ff-3af0-4d2e-a17b-98bb3dd94074}</Project>
+      <Name>SpreadsheetEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
