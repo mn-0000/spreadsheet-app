@@ -101,5 +101,15 @@ namespace CptS321.Tests
             var halfMaxValue = (double.MaxValue / 2.0).ToString("F", CultureInfo.InvariantCulture);
             Assert.True(double.IsInfinity(new ExpressionTree($"{halfMaxValue}+{halfMaxValue}").Evaluate()));
         }
+
+        [Test]
+        public void TestEvaluationWithVariableSet()
+        {
+            ExpressionTree exp22 = new ExpressionTree("4/A1");
+            exp22.SetVariable("A1", 16.0);
+            Assert.AreEqual(0.25, exp22.Evaluate());
+        }
+
+
     }
 }
