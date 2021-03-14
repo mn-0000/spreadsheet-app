@@ -110,6 +110,16 @@ namespace CptS321.Tests
             Assert.AreEqual(0.25, exp22.Evaluate());
         }
 
-
+        [Test]
+        public void TestEvaluationOverlappingVariables()
+        {
+            ExpressionTree exp23 = new ExpressionTree("A1/A2");
+            exp23.SetVariable("A1", 16.0);
+            exp23.SetVariable("A2", 4.0);
+            Assert.AreEqual(4.0, exp23.Evaluate());
+            ExpressionTree exp24 = new ExpressionTree("A1/6");
+            exp24.SetVariable("A1", 6.0);
+            Assert.AreEqual(1.0, exp24.Evaluate());
+        }
     }
 }
