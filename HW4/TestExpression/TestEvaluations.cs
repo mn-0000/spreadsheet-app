@@ -137,5 +137,18 @@ namespace CptS321.Tests
             exp24.SetVariable("A1", 6.0);
             Assert.AreEqual(1.0, exp24.Evaluate());
         }
+
+        [Test]
+        public void TestEvaluationWithParentheses()
+        {
+            ExpressionTree exp25 = new ExpressionTree("(4+7)/(1-3)");
+            ExpressionTree exp26 = new ExpressionTree("8+(4*3)");
+            ExpressionTree exp27 = new ExpressionTree("A1*(A2-A3)-2");
+            ExpressionTree exp28 = new ExpressionTree("A1/(A2+3)");
+            Assert.AreEqual(-5.5, exp25.Evaluate());
+            Assert.AreEqual(20.0, exp26.Evaluate());
+            Assert.AreEqual(-2.0, exp27.Evaluate());
+            Assert.AreEqual(0.0, exp28.Evaluate());
+        }
     }
 }
