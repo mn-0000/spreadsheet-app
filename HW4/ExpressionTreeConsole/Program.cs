@@ -52,6 +52,10 @@ namespace CptS321
             } while (choice != 4);
         }
 
+        /// <summary>
+        /// Prints the menu out to the console.
+        /// </summary>
+        /// <param name="expression"> the expression to be displayed </param>
         private static void MenuPrompt(string expression)
         {
             Console.WriteLine("Menu (Current expression: " + expression + ")");

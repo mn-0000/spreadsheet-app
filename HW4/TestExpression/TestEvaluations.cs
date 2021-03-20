@@ -10,6 +10,10 @@ namespace CptS321.Tests
     [TestFixture]
     public class ExpressionTreeTests
     {
+        /// <summary>
+        /// Test method for the ConvertToPostFix method in the ExpressionTree class, which determines whether the conversion
+        /// to post-fix notation was successful.
+        /// </summary>
         [Test]
         public void TestPostfixOutput()
         {
@@ -147,6 +151,10 @@ namespace CptS321.Tests
             Assert.AreEqual(1.0, exp24.Evaluate());
         }
 
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks if the expression (parentheses included)
+        /// is evaluated correctly.
+        /// </summary>
         [Test]
         public void TestEvaluationWithParentheses()
         {
@@ -160,6 +168,10 @@ namespace CptS321.Tests
             Assert.AreEqual(0.0, exp28.Evaluate());
         } 
         
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks to see if the code will throw
+        /// an exception when there is an imbalance in the number of left and right parentheses.
+        /// </summary>
         [Test]
         public void TestEvaluationUnbalancedParentheses()
         {
@@ -167,6 +179,10 @@ namespace CptS321.Tests
             Assert.That(() => exp29.Evaluate(), Throws.TypeOf<System.Exception>());
         }
 
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks if the expression (whitespaces included)
+        /// is evaluated correctly.
+        /// </summary>
         [Test]
         public void TestEvaluationWithWhitespace()
         {
@@ -178,6 +194,9 @@ namespace CptS321.Tests
             Assert.AreEqual(3.0, exp32.Evaluate());
         }
 
+        /// <summary>
+        /// Test method for the GetPrecedence method in the NodeFactory class to see if the precedence level is retrieved correctly.
+        /// </summary>
         [Test]
         public void TestCorrectPrecedence()
         {
@@ -188,6 +207,9 @@ namespace CptS321.Tests
             Assert.AreEqual(6, factory.GetPrecedence('/'));
         }
 
+        /// <summary>
+        /// Test method for the GetAssociativity method in the NodeFactory class to see if the associativity is retrieved correctly.
+        /// </summary>
         [Test]
         public void TestCorrectAssociativity()
         {

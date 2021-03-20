@@ -17,53 +17,66 @@ namespace CptS321
         internal Dictionary<string, double> variables = new Dictionary<string, double>();
 
         /// <summary>
-        /// Constructor that will set the result of the evaluation.
+        /// Constructor that adds all supported operators to the dictionary of operators.
         /// </summary>
-        /// <param name="postfixExpression"></param>
         public NodeFactory()
         {
-            TraverseAvailableOperators((op, type) => operators.Add(op, type));
+            SearchAllAvailableOperators((op, type) => operators.Add(op, type));
         }
 
-        private delegate void OnOperatorNode(char op, Type type);
+        private delegate void OnOperatorNode(char op, Type type); // event when an operator is detected
 
-        private void TraverseAvailableOperators(OnOperatorNode onNode)
+        /// <summary>
+        /// Gets all available operator classes from the current namespace.
+        /// </summary>
+        /// <param name="onOperatorNode"> event when operator is detected. </param>
+        private void SearchAllAvailableOperators(OnOperatorNode onOperatorNode)
         {
-            Type operatorNodeType = typeof(OperatorNode);
+            Type operatorNodeType = typeof(OperatorNode); // get the operator type of operator
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                // creates an iterable collection of all the currently supported operator types
                 IEnumerable<Type> operatorTypes = assembly.GetTypes()
                     .Where(type => type.IsSubclassOf(operatorNodeType));
 
                 foreach (var type in operatorTypes)
                 {
-                    PropertyInfo operatorField = type.GetProperty("Operator");
+                    PropertyInfo operatorField = type.GetProperty("Operator"); // get the operator property
                     if (operatorField != null)
                     {
-                        object value = operatorField.GetValue(type);
+                        object value = operatorField.GetValue(type); // get the operator
 
                         if (value is char)
                         {
                             char operatorSymbol = (char)value;
-                            onNode(operatorSymbol, type);
+                            onOperatorNode(operatorSymbol, type); // signals the constructor to add the operator to the dictionary
                         }
                     }
                 }
             }
         }
         
+        /// <summary>
+        /// Gets all the currently supported operators.
+        /// </summary>
+        /// <returns> the list of all supported operators </returns>
         public List<char> GetSupportedOperators()
         {
             return new List<char>(operators.Keys);
         }
 
-
+        /// <summary>
+        /// Creates a new operator node based on the incoming operator.
+        /// If the operator is not supported, throws a NotSupportedException.
+        /// </summary>
+        /// <param name="op"> the operator </param>
+        /// <returns> the new operator node </returns>
         public OperatorNode CreateOperatorNode(char op)
         {
             if (IsOperator(op))
             {
-                object operatorNodeObject = System.Activator.CreateInstance(operators[op]);
+                object operatorNodeObject = System.Activator.CreateInstance(operators[op]); // creates an instance of the operator
                 if (operatorNodeObject is OperatorNode)
                 {
                     return (OperatorNode)operatorNodeObject;
@@ -72,16 +85,21 @@ namespace CptS321
             throw new NotSupportedException("One or more operators is not supported yet.");
         }
 
+        /// <summary>
+        /// Gets the precedence level of the provided operator.
+        /// </summary>
+        /// <param name="op"> the operator to get the precedence from /param>
+        /// <returns> the precedence level of the operator </returns>
         public ushort GetPrecedence(char op)
         {
             ushort precedenceLevel = 0;
             if (IsOperator(op))
             {
                 Type type = operators[op];
-                PropertyInfo propertyInfo = type.GetProperty("Precedence");
+                PropertyInfo propertyInfo = type.GetProperty("Precedence"); // get the precedence property
                 if (propertyInfo != null)
                 {
-                    object propertyValue = propertyInfo.GetValue(type);
+                    object propertyValue = propertyInfo.GetValue(type); // get the precedence level
                     if (propertyValue is ushort)
                     {
                         precedenceLevel = (ushort)propertyValue;
@@ -91,16 +109,21 @@ namespace CptS321
             return precedenceLevel;
         }
 
+        /// <summary>
+        /// Gets the associativity of an operator.
+        /// </summary>
+        /// <param name="op"> the operator to get the associativity from </param>
+        /// <returns> the operator's associativity </returns>
         public OperatorNode.Associative GetAssociativity(char op)
         {
-            OperatorNode.Associative associativity = OperatorNode.Associative.Right;
+            OperatorNode.Associative associativity = OperatorNode.Associative.Right; // sets a default associativity
             if (IsOperator(op))
             {
                 Type type = operators[op];
-                PropertyInfo propertyInfo = type.GetProperty("Associativity");
+                PropertyInfo propertyInfo = type.GetProperty("Associativity"); // gets the associativity property
                 if (propertyInfo != null)
                 {
-                    object propertyValue = propertyInfo.GetValue(type);
+                    object propertyValue = propertyInfo.GetValue(type); // gets the associativity
                     if (propertyValue is OperatorNode.Associative)
                     {
                         associativity = (OperatorNode.Associative)propertyValue;
@@ -110,6 +133,11 @@ namespace CptS321
             return associativity;
         }
 
+        /// <summary>
+        /// Checks to see if the incoming character is a supported operator.
+        /// </summary>
+        /// <param name="c"> the character to check </param>
+        /// <returns> a boolean value based on whether the character is a supported operator or not.</returns>
         public bool IsOperator(char c)
         {
             return operators.ContainsKey(c);
