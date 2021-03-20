@@ -149,6 +149,26 @@ namespace CptS321.Tests
             Assert.AreEqual(20.0, exp26.Evaluate());
             Assert.AreEqual(-2.0, exp27.Evaluate());
             Assert.AreEqual(0.0, exp28.Evaluate());
+        }     
+
+        [Test]
+        public void TestCorrectPrecedence()
+        {
+            OperatorNodeFactory factory = new OperatorNodeFactory();
+            Assert.AreEqual(7, factory.GetPrecedence('+'));
+            Assert.AreEqual(7, factory.GetPrecedence('-'));
+            Assert.AreEqual(6, factory.GetPrecedence('*'));
+            Assert.AreEqual(6, factory.GetPrecedence('/'));
+        }
+
+        [Test]
+        public void TestCorrectAssociativity()
+        {
+            OperatorNodeFactory factory = new OperatorNodeFactory();
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('+'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('-'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('*'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('/'));
         }
     }
 }
