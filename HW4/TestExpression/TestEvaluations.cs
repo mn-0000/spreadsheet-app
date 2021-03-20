@@ -10,6 +10,15 @@ namespace CptS321.Tests
     [TestFixture]
     public class ExpressionTreeTests
     {
+        [Test]
+        public void TestPostfixOutput()
+        {
+            ExpressionTree exp00 = new ExpressionTree("1 - 2 + 3");
+            ExpressionTree exp000 = new ExpressionTree("(1-2) + 3-4/5");
+            Assert.AreEqual("1 2 - 3 +", exp00.ConvertToPostFix(exp00.RawExpression));
+            Assert.AreEqual("1 2 - 3 + 4 5 / -", exp000.ConvertToPostFix(exp000.RawExpression));
+        }
+
         /// <summary>
         /// Test method for the ExpressionTree class, which compares the results of the expressions
         /// with only '+' operators to the expected values.
@@ -149,12 +158,30 @@ namespace CptS321.Tests
             Assert.AreEqual(20.0, exp26.Evaluate());
             Assert.AreEqual(-2.0, exp27.Evaluate());
             Assert.AreEqual(0.0, exp28.Evaluate());
-        }     
+        } 
+        
+        [Test]
+        public void TestEvaluationUnbalancedParentheses()
+        {
+            ExpressionTree exp29 = new ExpressionTree("((16/4)-2");
+            Assert.That(() => exp29.Evaluate(), Throws.TypeOf<System.Exception>());
+        }
+
+        [Test]
+        public void TestEvaluationWithWhitespace()
+        {
+            ExpressionTree exp30 = new ExpressionTree("8 - 5 * 7");
+            ExpressionTree exp31 = new ExpressionTree("14-6* 2");
+            ExpressionTree exp32 = new ExpressionTree("(X - 3) / (2 - 3)");
+            Assert.AreEqual(-27.0, exp30.Evaluate());
+            Assert.AreEqual(2.0, exp31.Evaluate());
+            Assert.AreEqual(3.0, exp32.Evaluate());
+        }
 
         [Test]
         public void TestCorrectPrecedence()
         {
-            OperatorNodeFactory factory = new OperatorNodeFactory();
+            NodeFactory factory = new NodeFactory();
             Assert.AreEqual(7, factory.GetPrecedence('+'));
             Assert.AreEqual(7, factory.GetPrecedence('-'));
             Assert.AreEqual(6, factory.GetPrecedence('*'));
@@ -164,7 +191,7 @@ namespace CptS321.Tests
         [Test]
         public void TestCorrectAssociativity()
         {
-            OperatorNodeFactory factory = new OperatorNodeFactory();
+            NodeFactory factory = new NodeFactory();
             Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('+'));
             Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('-'));
             Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('*'));
