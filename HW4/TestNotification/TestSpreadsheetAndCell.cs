@@ -54,7 +54,7 @@ namespace CptS321.Tests
         {
             testSpreadsheet.cellArray[0, 0].Text = "Goodbye!";
             testSpreadsheet.cellArray[0, 1].Text = "=A1";
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, "Goodbye!");
+            Assert.AreEqual(testSpreadsheet.cellArray[0, 1].Value, "Goodbye!");
         }
 
         /// <summary>

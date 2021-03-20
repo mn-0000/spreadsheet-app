@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetEngine", "..\Spr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSpreadsheet", "..\TestNotification\TestSpreadsheet.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionTreeTests", "..\TestExpression\ExpressionTreeTests.csproj", "{C3E7AE6E-9AEB-45BC-9523-018256EC8DF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionTreeConsole", "..\ExpressionTreeConsole\ExpressionTreeConsole.csproj", "{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E7AE6E-9AEB-45BC-9523-018256EC8DF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E7AE6E-9AEB-45BC-9523-018256EC8DF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E7AE6E-9AEB-45BC-9523-018256EC8DF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E7AE6E-9AEB-45BC-9523-018256EC8DF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDBF081D-E6D2-42FD-B7A3-9D663A72542C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,7 +12,7 @@ namespace CptS321
         {
             int choice = 0;
             double variableTest = 0;
-            ExpressionTree currentExpression = new ExpressionTree("A1+B2+C3");
+            ExpressionTree currentExpression = new ExpressionTree("A1*(A2-A3)-2");
             do
             {
                 Program.MenuPrompt(currentExpression.RawExpression);
@@ -52,6 +52,10 @@ namespace CptS321
             } while (choice != 4);
         }
 
+        /// <summary>
+        /// Prints the menu out to the console.
+        /// </summary>
+        /// <param name="expression"> the expression to be displayed </param>
         private static void MenuPrompt(string expression)
         {
             Console.WriteLine("Menu (Current expression: " + expression + ")");

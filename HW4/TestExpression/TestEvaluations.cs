@@ -11,6 +11,19 @@ namespace CptS321.Tests
     public class ExpressionTreeTests
     {
         /// <summary>
+        /// Test method for the ConvertToPostFix method in the ExpressionTree class, which determines whether the conversion
+        /// to post-fix notation was successful.
+        /// </summary>
+        [Test]
+        public void TestPostfixOutput()
+        {
+            ExpressionTree exp00 = new ExpressionTree("1 - 2 + 3");
+            ExpressionTree exp000 = new ExpressionTree("(1-2) + 3-4/5");
+            Assert.AreEqual("1 2 - 3 +", exp00.ConvertToPostFix(exp00.RawExpression));
+            Assert.AreEqual("1 2 - 3 + 4 5 / -", exp000.ConvertToPostFix(exp000.RawExpression));
+        }
+
+        /// <summary>
         /// Test method for the ExpressionTree class, which compares the results of the expressions
         /// with only '+' operators to the expected values.
         /// </summary>
@@ -136,6 +149,75 @@ namespace CptS321.Tests
             ExpressionTree exp24 = new ExpressionTree("A1/6");
             exp24.SetVariable("A1", 6.0);
             Assert.AreEqual(1.0, exp24.Evaluate());
+        }
+
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks if the expression (parentheses included)
+        /// is evaluated correctly.
+        /// </summary>
+        [Test]
+        public void TestEvaluationWithParentheses()
+        {
+            ExpressionTree exp25 = new ExpressionTree("(4+7)/(1-3)");
+            ExpressionTree exp26 = new ExpressionTree("8+(4*3)");
+            ExpressionTree exp27 = new ExpressionTree("A1*(A2-A3)-2");
+            ExpressionTree exp28 = new ExpressionTree("A1/(A2+3)");
+            Assert.AreEqual(-5.5, exp25.Evaluate());
+            Assert.AreEqual(20.0, exp26.Evaluate());
+            Assert.AreEqual(-2.0, exp27.Evaluate());
+            Assert.AreEqual(0.0, exp28.Evaluate());
+        } 
+        
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks to see if the code will throw
+        /// an exception when there is an imbalance in the number of left and right parentheses.
+        /// </summary>
+        [Test]
+        public void TestEvaluationUnbalancedParentheses()
+        {
+            ExpressionTree exp29 = new ExpressionTree("((16/4)-2");
+            Assert.That(() => exp29.Evaluate(), Throws.TypeOf<System.Exception>());
+        }
+
+        /// <summary>
+        /// Test method for the ExpressionTree class, which checks if the expression (whitespaces included)
+        /// is evaluated correctly.
+        /// </summary>
+        [Test]
+        public void TestEvaluationWithWhitespace()
+        {
+            ExpressionTree exp30 = new ExpressionTree("8 - 5 * 7");
+            ExpressionTree exp31 = new ExpressionTree("14-6* 2");
+            ExpressionTree exp32 = new ExpressionTree("(X - 3) / (2 - 3)");
+            Assert.AreEqual(-27.0, exp30.Evaluate());
+            Assert.AreEqual(2.0, exp31.Evaluate());
+            Assert.AreEqual(3.0, exp32.Evaluate());
+        }
+
+        /// <summary>
+        /// Test method for the GetPrecedence method in the NodeFactory class to see if the precedence level is retrieved correctly.
+        /// </summary>
+        [Test]
+        public void TestCorrectPrecedence()
+        {
+            NodeFactory factory = new NodeFactory();
+            Assert.AreEqual(7, factory.GetPrecedence('+'));
+            Assert.AreEqual(7, factory.GetPrecedence('-'));
+            Assert.AreEqual(6, factory.GetPrecedence('*'));
+            Assert.AreEqual(6, factory.GetPrecedence('/'));
+        }
+
+        /// <summary>
+        /// Test method for the GetAssociativity method in the NodeFactory class to see if the associativity is retrieved correctly.
+        /// </summary>
+        [Test]
+        public void TestCorrectAssociativity()
+        {
+            NodeFactory factory = new NodeFactory();
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('+'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('-'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('*'));
+            Assert.AreEqual(OperatorNode.Associative.Left, factory.GetAssociativity('/'));
         }
     }
 }
