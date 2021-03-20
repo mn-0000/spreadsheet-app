@@ -14,8 +14,10 @@ namespace CptS321
     {
         // member variables
         private string rawExpression;
-        private Dictionary<string, double> variables = new Dictionary<string, double>();
-        
+
+        // create an instance of the node factory.
+        private NodeFactory factory = new NodeFactory();
+
         /// <summary>
         /// Constructor for the ExpressionTree class. Sets the rawExpression field and clears the variable dictionary.
         /// </summary>
@@ -23,7 +25,7 @@ namespace CptS321
         public ExpressionTree(string expression)
         {
             this.rawExpression = expression;
-            this.variables.Clear();
+            factory.variables.Clear();
         }
 
         public string RawExpression
@@ -38,7 +40,7 @@ namespace CptS321
         /// <param name="variableValue"></param>
         public void SetVariable(string variableName, double variableValue)
         {
-            variables.Add(variableName, variableValue);
+            factory.variables.Add(variableName, variableValue);
         }
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace CptS321
         {
             // converts the tree's raw expression to postfix format.
             string postfixExpression = ConvertToPostFix(rawExpression);
-            
+
             // needed variables
             Stack<ExpressionTreeNode> nodeStack = new Stack<ExpressionTreeNode>();
             ConstantNode constantNode;
@@ -58,25 +60,27 @@ namespace CptS321
             double test = 0;
 
             string[] treeComponents = postfixExpression.Split(' '); // extracts all elements of the postfix expression and add them to a string array.
+
             foreach (string component in treeComponents)
             {
+                if ("()".Contains(component)) throw new Exception("The number of left and right parentheses are not the same.");
                 // if the incoming string is a double, create a new constant node and push it to the stack.
                 if (double.TryParse(component, out test))
                 {
-                    constantNode = CreateConstantNode(Convert.ToDouble(component));
+                    constantNode = factory.CreateConstantNode(Convert.ToDouble(component));
                     nodeStack.Push(constantNode);
                 }
                 // else if the incoming string is a variable name, create a new variable node and push it to the stack.
                 else if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
                 {
-                    variableNode = CreateVariableNode(component);
+                    variableNode = factory.CreateVariableNode(component);
                     nodeStack.Push(variableNode);
                 }
                 // else if the incoming string is an operator, create a new corresponding operator node, pops the last 2 nodes and have them
                 // as the operator's children.
                 else
                 {
-                    operatorNode = CreateOperatorNode(char.Parse(component));
+                    operatorNode = factory.CreateOperatorNode(char.Parse(component));
                     operatorNode.Right = nodeStack.Pop();
                     operatorNode.Left = nodeStack.Pop();
                     nodeStack.Push(operatorNode);
@@ -90,38 +94,61 @@ namespace CptS321
         /// </summary>
         /// <param name="expression"> the expression to be converted </param>
         /// <returns> the given expression, in post-fix format </returns>
-        private string ConvertToPostFix(string expression)
+        public string ConvertToPostFix(string expression)
         {
             Stack<char> operatorStack = new Stack<char>(); // creates a stack to store operators
             StringBuilder postfixExpression = new StringBuilder(); // creates an amendable string
             foreach (char c in expression)
             {
-                // if the character is not one of the operators, add it to the postfix string.
-                if (!"()+-*/%^".Contains(c.ToString())) postfixExpression.Append(c);
-                // if the character is one of the operators, execute the following block of code.
-                else
+                if (!char.IsWhiteSpace(c)) // only execute the following block of code if the incoming character is not a whitespace
                 {
-                    postfixExpression.Append(" "); //marks the end of the string representing a constant or variable.
-                    if (c == '(') operatorStack.Push(c); // if the operator is a left parenthesis, push to operator stack (should not be used for HW4)
-                    else if (c == ')') ; // if the operator is a right parenthesis, discard it (should not be used for HW4)
+                 // if the character is not one of the operators, add it to the postfix string.
+                    if (!"()+-*/%^".Contains(c.ToString())) postfixExpression.Append(c);
+                    // if the character is one of the operators, execute the following block of code.
                     else
                     {
-                        // if there operator stack is empty, or there's a left parenthesis at the top of the stack, push this operator to the stack.
-                        if (operatorStack.Count == 0 || operatorStack.Peek() == '(') operatorStack.Push(c);
+                        if (c == '(') operatorStack.Push(c); // if the operator is a left parenthesis, push to operator stack 
 
-                        // else if the precedence of the incoming operator is higher than that of the operator at the top of the stack, push the operator to the stack.
-                        else if (Precedence(c) > Precedence(operatorStack.Peek())) operatorStack.Push(c);
-                        //|| (Precedence(c) == Precedence(operatorStack.Peek()) && CreateOperatorNode(c).Associativity = Right) - condition for next HW
-
-                        // else if the precedence of the incoming operator is lower than or equal to that of the operator at the top of the stack
-                        else if (Precedence(c) <= Precedence(operatorStack.Peek()))
+                        // if the operator is a right parenthesis, continuously pop the operator at the top of the stack off 
+                        // and add it to the postfix string along with a whitespace before it, until the top of the stack is
+                        // a left parenthesis.
+                        else if (c == ')')
                         {
-                            // while there are still operators in the stack, and the precedence of the incoming operator is lower than 
-                            // or equal to that of the operator at the top of the stack, pop the operator at the top of the stack off 
-                            // and add it to the postfix string along with a whitespace.
-                            while (operatorStack.Count != 0 && Precedence(c) <= Precedence(operatorStack.Peek())) postfixExpression.Append(operatorStack.Pop() + " ");
-                            // when there are no operators left on the stack, push the incoming operator to stack.
-                            operatorStack.Push(c);
+                            while (operatorStack.Peek() != '(') postfixExpression.Append(" " + operatorStack.Pop());
+                            operatorStack.Pop(); // discards the left parenthesis
+                        }
+                        else
+                        {
+                            postfixExpression.Append(" "); //marks the end of the string representing a constant or variable.
+                                                           // if there operator stack is empty, or there's a left parenthesis at the top of the stack, push this operator to the stack.
+                            if (operatorStack.Count == 0 || operatorStack.Peek() == '(') operatorStack.Push(c);
+
+                            // else if the precedence of the incoming operator is higher than that of the operator at the top of the stack, 
+                            // or if the operator has the same precedence as the operator on the top of the stack and is right associative, 
+                            // push the operator to the stack.
+                            else if (factory.GetPrecedence(c) < factory.GetPrecedence(operatorStack.Peek())
+                                 || (factory.GetPrecedence(c) == factory.GetPrecedence(operatorStack.Peek()) && factory.GetAssociativity(c) == OperatorNode.Associative.Right))
+                                operatorStack.Push(c);
+
+                            // else if the precedence of the incoming operator is lower than or equal to that of the operator at the top of the stack, 
+                            // or if the operator has the same precedence as the operator on the top of the stack and is left associative
+                            else if (factory.GetPrecedence(c) >= factory.GetPrecedence(operatorStack.Peek())
+                                 || (factory.GetPrecedence(c) == factory.GetPrecedence(operatorStack.Peek()) && factory.GetAssociativity(c) == OperatorNode.Associative.Left))
+                            {
+                                // while there are still operators in the stack, and the precedence of the incoming operator is lower than 
+                                // or equal to that of the operator at the top of the stack, pop the operator at the top of the stack off 
+                                // and add it to the postfix string along with a whitespace.
+                                while (operatorStack.Count > 0)
+                                {
+                                    if (factory.GetPrecedence(c) >= factory.GetPrecedence(operatorStack.Peek())
+                                    || (factory.GetPrecedence(c) == factory.GetPrecedence(operatorStack.Peek()) && factory.GetAssociativity(c) == OperatorNode.Associative.Left))
+                                    {
+                                        postfixExpression.Append(operatorStack.Pop() + " ");
+                                    }
+                                }
+                                // when there are no operators left on the stack, push the incoming operator to stack.
+                                operatorStack.Push(c);
+                            }
                         }
                     }
                 }
@@ -134,71 +161,6 @@ namespace CptS321
             }
             // converts the postfix string to string format, and return it.
             return postfixExpression.ToString();
-        }
-
-        /// <summary>
-        /// Determines the precedence of the operators. Any unsupported operators will throw a NotSupportedException.
-        /// This method will exist until later homeworks that require precedence and associativity.
-        /// </summary>
-        /// <param name="symbol"> the operator to determine precedence of </param>
-        /// <returns> the precedence value of the operator. </returns>
-        private int Precedence(char symbol)
-        {
-            switch (symbol)
-            {
-                case '+':
-                    return 7;
-                case '-':
-                    return 7;
-                case '*':
-                    return 6;
-                case '/':
-                    return 6;
-                default:
-                    throw new NotSupportedException("This operator (" + symbol + ") is not supported.");
-            }
-        }
-
-        /// <summary>
-        /// Creates a new constant node.
-        /// </summary>
-        /// <param name="constant"> the incoming constant </param>
-        /// <returns> the new ConstantNode </returns>
-        protected ConstantNode CreateConstantNode(double constant)
-        {
-            return new ConstantNode(constant);
-        }
-
-        /// <summary>
-        /// Creates a new variable node.
-        /// </summary>
-        /// <param name="variableName"> the name of the variable </param>
-        /// <returns> the new VariableNode </returns>
-        protected VariableNode CreateVariableNode(string variableName)
-        {
-            return new VariableNode(variableName, ref variables);
-        }
-
-        /// <summary>
-        /// Creates a new operator node. Any unsupported operators will throw a NotSupportedException.
-        /// </summary>
-        /// <param name="c"> the provided operator </param>
-        /// <returns> the new operator node dependent on which operator it was </returns>
-        protected OperatorNode CreateOperatorNode(char c)
-        {
-            switch (c)
-            {
-                case '+':
-                    return new PlusOperatorNode();
-                case '-':
-                    return new MinusOperatorNode();
-                case '*':
-                    return new MultiplyOperatorNode();
-                case '/':
-                    return new DivideOperatorNode();
-                default:
-                    throw new NotSupportedException("This operator (" + c + ") is currently not supported");
-            }
         }
     }
 }
