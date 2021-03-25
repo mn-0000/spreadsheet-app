@@ -120,7 +120,7 @@ namespace CptS321
                         else
                         {
                             postfixExpression.Append(" "); //marks the end of the string representing a constant or variable.
-                                                           // if there operator stack is empty, or there's a left parenthesis at the top of the stack, push this operator to the stack.
+                            // if there operator stack is empty, or there's a left parenthesis at the top of the stack, push this operator to the stack.
                             if (operatorStack.Count == 0 || operatorStack.Peek() == '(') operatorStack.Push(c);
 
                             // else if the precedence of the incoming operator is higher than that of the operator at the top of the stack, 
@@ -145,6 +145,7 @@ namespace CptS321
                                     {
                                         postfixExpression.Append(operatorStack.Pop() + " ");
                                     }
+                                    else break;
                                 }
                                 // when there are no operators left on the stack, push the incoming operator to stack.
                                 operatorStack.Push(c);
