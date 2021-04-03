@@ -37,9 +37,9 @@ namespace CptS321.Tests
             ExpressionTree exp5 = new ExpressionTree("B3+nice+3");
             Assert.AreEqual(18.0, exp1.Evaluate());
             Assert.AreEqual(40.0, exp2.Evaluate());
-            Assert.AreEqual(10.0, exp3.Evaluate());
-            Assert.AreEqual(0.0, exp4.Evaluate());
-            Assert.AreEqual(3.0, exp5.Evaluate());
+            Assert.AreEqual(double.NaN, exp3.Evaluate());
+            Assert.AreEqual(double.NaN, exp4.Evaluate());
+            Assert.AreEqual(double.NaN, exp5.Evaluate());
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace CptS321.Tests
             Assert.AreEqual(5.0, exp6.Evaluate());
             Assert.AreEqual(0.0, exp7.Evaluate());
             Assert.AreEqual(-1.0, exp8.Evaluate());
-            Assert.AreEqual(0.0, exp9.Evaluate());
-            Assert.AreEqual(-2.0, exp10.Evaluate());
+            Assert.AreEqual(double.NaN, exp9.Evaluate());
+            Assert.AreEqual(double.NaN, exp10.Evaluate());
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace CptS321.Tests
             Assert.AreEqual(56.0, exp11.Evaluate());
             Assert.AreEqual(120.0, exp12.Evaluate());
             Assert.AreEqual(0.0, exp13.Evaluate());
-            Assert.AreEqual(0.0, exp14.Evaluate());
-            Assert.AreEqual(0.0, exp15.Evaluate());
+            Assert.AreEqual(double.NaN, exp14.Evaluate());
+            Assert.AreEqual(double.NaN, exp15.Evaluate());
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace CptS321.Tests
             Assert.AreEqual(0.0, exp18.Evaluate());
             Assert.AreEqual(double.PositiveInfinity, exp19.Evaluate());
             Assert.AreEqual(double.NaN, exp20.Evaluate());
-            Assert.AreEqual(0.0, exp21.Evaluate());
+            Assert.AreEqual(double.NaN, exp21.Evaluate());
         }
 
         /// <summary>
@@ -164,8 +164,8 @@ namespace CptS321.Tests
             ExpressionTree exp28 = new ExpressionTree("A1/(A2+3)");
             Assert.AreEqual(-5.5, exp25.Evaluate());
             Assert.AreEqual(20.0, exp26.Evaluate());
-            Assert.AreEqual(-2.0, exp27.Evaluate());
-            Assert.AreEqual(0.0, exp28.Evaluate());
+            Assert.AreEqual(double.NaN, exp27.Evaluate());
+            Assert.AreEqual(double.NaN, exp28.Evaluate());
         } 
         
         /// <summary>
@@ -191,7 +191,7 @@ namespace CptS321.Tests
             ExpressionTree exp32 = new ExpressionTree("(X - 3) / (2 - 3)");
             Assert.AreEqual(-27.0, exp30.Evaluate());
             Assert.AreEqual(2.0, exp31.Evaluate());
-            Assert.AreEqual(3.0, exp32.Evaluate());
+            Assert.AreEqual(double.NaN, exp32.Evaluate());
         }
 
         /// <summary>

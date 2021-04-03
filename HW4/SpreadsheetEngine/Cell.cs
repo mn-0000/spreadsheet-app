@@ -15,12 +15,20 @@ namespace CptS321
 
         // member variables
         protected string text = "";
-        protected string value = "";
+        protected string value;
         protected int rowIndex;
         protected int columnIndex;
-       
+        protected bool isEventFired = false;
+        protected List<Cell> dependents = new List<Cell>();
+        protected ExpressionTree tempExpressionTree;
+        protected string postfixExpression;
+        protected string[] treeComponents;
+
         public int RowIndex { get { return rowIndex; } }
         public int ColumnIndex { get { return columnIndex; } }
+
+        public List<Cell> Dependents { get { return dependents; } }
+        public string[] TreeComponents { get { return treeComponents; } }
 
         /// <summary>
         /// Constructor for the Cell class.
@@ -41,13 +49,29 @@ namespace CptS321
             {
                 if (text == value) { return; }
                 text = value;
-                OnPropertyChanged();
+                if (value == null) { return; }
+                else
+                {
+                    if (text.StartsWith("="))
+                    {
+                        tempExpressionTree = new ExpressionTree(text.Substring(1));
+                    }
+                    else
+                    {
+                        tempExpressionTree = new ExpressionTree(text);
+                    }
+                    treeComponents = tempExpressionTree.ConvertToPostFix(tempExpressionTree.RawExpression).Split(' ');
+                    OnPropertyChanged();
+                }
             }
         }
+
         public string Value
         {
             get { return value; }
         }
+
+        public bool IsEventFired { get { return isEventFired; } set { } }
 
         /// <summary>
         /// Sets the value for a cell.
@@ -62,6 +86,57 @@ namespace CptS321
         public void OnPropertyChanged([CallerMemberName] string value = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(value));
+            isEventFired = true;
+        }
+
+        public void Update()
+        {
+            foreach (Cell cell in dependents)
+            {
+
+                if (cell.IsEventFired == true)
+                {
+                    OnPropertyChanged();
+                    cell.IsEventFired = false;
+                }
+            }
+        }
+
+        public void AddDependents(Spreadsheet spreadsheet)
+        {
+            double test = 0;
+            foreach (string component in treeComponents)
+            {
+                if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
+                {
+                    int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
+                    int columnNumber = component[0] - 65;
+                    dependents.Add(spreadsheet.cellArray[rowNumber, columnNumber]);
+                    foreach (Cell cell in dependents)
+                    {
+                        if (!cell.Dependents.Contains(this))
+                        {
+                            cell.Dependents.Add(this);
+                        }
+                    }
+                    foreach (Cell dependentCell in spreadsheet.cellArray[rowNumber, columnNumber].Dependents)
+                    {
+                        if (!dependentCell.Dependents.Contains(this))
+                        {
+                            dependentCell.Dependents.Add(this);
+                        }
+                    }
+
+                }
+            }
+            foreach (Cell cell in Dependents)
+            {
+                if (cell.IsEventFired == true)
+                {
+                    cell.IsEventFired = false;
+                    cell.OnPropertyChanged();
+                }
+            }
         }
     }
 }

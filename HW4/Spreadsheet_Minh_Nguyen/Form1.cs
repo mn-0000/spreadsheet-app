@@ -36,6 +36,16 @@ namespace Spreadsheet_Minh_Nguyen
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text;
+        }
+
+        /// <summary>
         /// Upon finishing editing a DataGridView cell's text, assign that text to the Cell's Text property at the corresponding position.
         /// </summary>
         /// <param name="sender"> the DataGridView cell that has its text changed. </param>
@@ -43,6 +53,22 @@ namespace Spreadsheet_Minh_Nguyen
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+
+            if (!String.IsNullOrEmpty(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text)) {
+                if (userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text.StartsWith("="))
+                {
+                    if (Double.IsNaN(Double.Parse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value)))
+                    {
+                        MessageBox.Show("One or more cells you're referring to is invalid or currently empty. Please try again!");
+                    }
+                    else
+                    {
+                        userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].AddDependents(userSpreadsheet);
+                        userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Update();
+                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value;
+                    }
+                }
+            }
         }
 
         /// <summary>

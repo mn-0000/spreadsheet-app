@@ -30,7 +30,6 @@ namespace Spreadsheet_Minh_Nguyen
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.btnDemo = new System.Windows.Forms.Button();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -51,24 +50,14 @@ namespace Spreadsheet_Minh_Nguyen
             this.Column4,
             this.Column5});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 30);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(800, 420);
+            this.dataGridView1.Size = new System.Drawing.Size(800, 450);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dataGridView1_CellBeginEdit);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
-            // 
-            // btnDemo
-            // 
-            this.btnDemo.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnDemo.Location = new System.Drawing.Point(0, 0);
-            this.btnDemo.Name = "btnDemo";
-            this.btnDemo.Size = new System.Drawing.Size(800, 30);
-            this.btnDemo.TabIndex = 1;
-            this.btnDemo.Text = "Activate Demo";
-            this.btnDemo.UseVisualStyleBackColor = true;
-            this.btnDemo.Click += new System.EventHandler(this.btnDemo_Click);
             // 
             // Column1
             // 
@@ -111,7 +100,6 @@ namespace Spreadsheet_Minh_Nguyen
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.btnDemo);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -123,7 +111,6 @@ namespace Spreadsheet_Minh_Nguyen
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button btnDemo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;

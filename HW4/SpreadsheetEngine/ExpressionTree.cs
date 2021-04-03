@@ -16,8 +16,7 @@ namespace CptS321
         private string rawExpression;
 
         // create an instance of the node factory.
-        private NodeFactory factory = new NodeFactory();
-
+        NodeFactory factory = new NodeFactory();
         /// <summary>
         /// Constructor for the ExpressionTree class. Sets the rawExpression field and clears the variable dictionary.
         /// </summary>
@@ -49,6 +48,7 @@ namespace CptS321
         /// <returns> the result of the evaluation </returns>
         public double Evaluate()
         {
+
             // converts the tree's raw expression to postfix format.
             string postfixExpression = ConvertToPostFix(rawExpression);
 
@@ -102,7 +102,7 @@ namespace CptS321
             {
                 if (!char.IsWhiteSpace(c)) // only execute the following block of code if the incoming character is not a whitespace
                 {
-                 // if the character is not one of the operators, add it to the postfix string.
+                    // if the character is not one of the operators, add it to the postfix string.
                     if (!"()+-*/%^".Contains(c.ToString())) postfixExpression.Append(c);
                     // if the character is one of the operators, execute the following block of code.
                     else
@@ -162,6 +162,65 @@ namespace CptS321
             }
             // converts the postfix string to string format, and return it.
             return postfixExpression.ToString();
+        }
+
+        public double EvaluateSpreadsheetFormula(Cell[,] cellArray)
+        {
+            string postfixExpression = ConvertToPostFix(rawExpression);
+            // needed variables
+            Stack<ExpressionTreeNode> nodeStack = new Stack<ExpressionTreeNode>();
+            ConstantNode constantNode;
+            VariableNode variableNode;
+            OperatorNode operatorNode;
+            double test = 0;
+
+            string[] treeComponents = postfixExpression.Split(' '); // extracts all elements of the postfix expression and add them to a string array.
+
+            foreach (string component in treeComponents)
+            {
+                if ("()".Contains(component)) { throw new Exception("The number of left and right parentheses are not the same."); }
+                // if the incoming string is a double, create a new constant node and push it to the stack.
+                if (double.TryParse(component, out test))
+                {
+                    constantNode = factory.CreateConstantNode(Convert.ToDouble(component));
+                    nodeStack.Push(constantNode);
+                }
+                // else if the incoming string is a variable name, create a new variable node and push it to the stack.
+                else if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
+                {
+                    try
+                    {
+                        int rowNumber = 0;
+                        rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
+                        int columnNumber = columnNumber = component[0] - 65;
+                        string cellValue = cellArray[rowNumber, columnNumber].Value;
+                        constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
+                        nodeStack.Push(constantNode);
+                    }
+                    catch (ArgumentNullException)
+                    {
+                        return Double.NaN;
+                    }
+                    catch (FormatException)
+                    {
+                        return Double.NaN;
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        return Double.NaN;
+                    }
+                }
+                // else if the incoming string is an operator, create a new corresponding operator node, pops the last 2 nodes and have them
+                // as the operator's children.
+                else
+                {
+                    operatorNode = factory.CreateOperatorNode(char.Parse(component));
+                    operatorNode.Right = nodeStack.Pop();
+                    operatorNode.Left = nodeStack.Pop();
+                    nodeStack.Push(operatorNode);
+                }
+            }
+            return nodeStack.Peek().Evaluate(); // evaluates the tree and returns the result.
         }
     }
 }
