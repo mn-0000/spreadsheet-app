@@ -42,8 +42,8 @@ namespace CptS321.Tests
         [Test]
         public void TestCellValueChanged()
         {
-            testSpreadsheet.cellArray[0, 0].Text = "Hello!";
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, "Hello!");
+            testSpreadsheet.cellArray[0, 0].Text = "8";
+            Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, "8");
         }
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace CptS321.Tests
         [Test]
         public void TestCellAssignmentValue()
         {
-            testSpreadsheet.cellArray[0, 0].Text = "Goodbye!";
+            testSpreadsheet.cellArray[0, 0].Text = "17";
             testSpreadsheet.cellArray[0, 1].Text = "=A1";
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 1].Value, "Goodbye!");
+            Assert.AreEqual(17, Double.Parse(testSpreadsheet.cellArray[0, 1].Value));
         }
 
         /// <summary>
