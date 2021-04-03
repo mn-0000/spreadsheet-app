@@ -30,10 +30,10 @@ namespace CptS321.Tests
         [Test]
         public void TestSpreadsheetValue()
         {
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 0].Value, 10.ToString());
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 4].Value, 10.ToString());
-            Assert.AreEqual(testSpreadsheet.cellArray[4, 0].Value, 10.ToString());
-            Assert.AreEqual(testSpreadsheet.cellArray[4, 4].Value, 10.ToString());
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 0].Value);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 4].Value);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[4, 0].Value);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[4, 4].Value);
         }
 
         /// <summary>
@@ -67,13 +67,29 @@ namespace CptS321.Tests
         }
 
         /// <summary>
-        /// Test method for the Spreadsheet class, that checks if the program notifies user if their input was incorrect.
+        /// Test method for the Spreadsheet class, that checks if a cell is updated properly when a cell
+        /// it's referring to has updated.
         /// </summary>
         [Test]
-        public void TestReferenceError()
+        public void TestReassignValue()
         {
-            testSpreadsheet.cellArray[0, 3].Text = "=XX99";
-            Assert.AreEqual(testSpreadsheet.cellArray[0, 3].Value, "Invalid reference");
+            testSpreadsheet.cellArray[0, 0].Text = "17";
+            testSpreadsheet.cellArray[0, 1].Text = "=A1";
+            testSpreadsheet.cellArray[0, 1].AddDependents(testSpreadsheet);   
+            testSpreadsheet.cellArray[0, 0].Text = "40";
+            testSpreadsheet.cellArray[0, 1].Update();
+            Assert.AreEqual(40, Double.Parse(testSpreadsheet.cellArray[0, 1].Value));
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the program correctly handles
+        /// an invalid reference.
+        /// </summary>
+        [Test]
+        public void TestInvalidReference()
+        {
+            testSpreadsheet.cellArray[0, 0].Text = "=XX99";
+            Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
         }
     }
 }
