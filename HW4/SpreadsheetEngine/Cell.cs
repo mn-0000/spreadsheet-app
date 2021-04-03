@@ -49,9 +49,11 @@ namespace CptS321
             {
                 if (text == value) { return; }
                 text = value;
-                if (value == null) { return; }
+       
+                if (value == null) { return; } // if the new value is null, simply return
                 else
                 {
+                    // If the text is a formula, create a new expression tree with the equal sign omitted.
                     if (text.StartsWith("="))
                     {
                         tempExpressionTree = new ExpressionTree(text.Substring(1));

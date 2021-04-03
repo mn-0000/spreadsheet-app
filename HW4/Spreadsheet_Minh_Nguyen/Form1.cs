@@ -59,7 +59,11 @@ namespace Spreadsheet_Minh_Nguyen
                 {
                     if (Double.IsNaN(Double.Parse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value)))
                     {
-                        MessageBox.Show("One or more cells you're referring to is invalid or currently empty. Please try again!");
+                        MessageBox.Show("Your formula has an error. This could be due to the following reasons:" +
+                            "\n    - One or more cells you're referring to is invalid or currently empty." +
+                            "\n    - The number of opening and closing parentheses are not the same." +
+                            "\n    - There are no arguments in your formula." +
+                            "\nPlease try again!");
                     }
                     else
                     {

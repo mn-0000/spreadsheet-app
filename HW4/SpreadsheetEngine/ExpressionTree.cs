@@ -178,7 +178,7 @@ namespace CptS321
 
             foreach (string component in treeComponents)
             {
-                if ("()".Contains(component)) { throw new Exception("The number of left and right parentheses are not the same."); }
+                if ("()".Contains(component)) { return Double.NaN; }
                 // if the incoming string is a double, create a new constant node and push it to the stack.
                 if (double.TryParse(component, out test))
                 {

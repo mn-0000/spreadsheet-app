@@ -62,14 +62,13 @@ namespace CptS321
             }
             // If the sender cell's text starts with '=', perform evaluation.
             else
-            {             
+            {   
+                // Create a new expression tree with the given formula to access its methods.
                 ExpressionTree expressionTree = new ExpressionTree(cell.Text.Substring(1));
-                // Get the cell at the sender cell's position, and assign its text to the cell array's cell at the equivalent position.
+                // Evaluates the formula, sets the value for the cell.
                 cellArray[cell.RowIndex, cell.ColumnIndex].SetValue(expressionTree.EvaluateSpreadsheetFormula(cellArray).ToString());
             }
 
-            // Set the value for the cell.
-            
             CellPropertyChanged(sender, e);
         }
 
