@@ -11,6 +11,9 @@ using System.Windows.Forms;
 
 namespace Spreadsheet_Minh_Nguyen
 {
+    /// <summary>
+    /// The main form.
+    /// </summary>
     public partial class Form1 : Form
     {
         public Spreadsheet userSpreadsheet;
@@ -36,43 +39,54 @@ namespace Spreadsheet_Minh_Nguyen
         }
 
         /// <summary>
-        /// 
+        /// When the user begins editing a cell, display that cell's text.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender"> the current DataGridView cell </param>
+        /// <param name="e"> the properties of the current DataGridView cell </param>
         private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text;
         }
 
         /// <summary>
-        /// Upon finishing editing a DataGridView cell's text, assign that text to the Cell's Text property at the corresponding position.
+        /// Upon finishing editing a DataGridView cell's text, assign that text to the Cell's Text property at the corresponding position,
+        /// or evaluate the formula if it starts with an equal sign.
         /// </summary>
         /// <param name="sender"> the DataGridView cell that has its text changed. </param>
         /// <param name="e"> the data of the DataGridView cell that has its text changed. </param>
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            double test = 0; // for the TryParse method
+
+            // sets the text of the cell
             userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
 
-            if (!String.IsNullOrEmpty(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text)) {
-                if (userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text.StartsWith("="))
+            // If the cell is empty or is both not a double and not a formula, update the dependent cells.
+            if (String.IsNullOrEmpty(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text) 
+                || (!double.TryParse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text, out test) && !userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text.StartsWith("=")))
+            {
+                foreach (Cell dependent in userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Dependents) dependent.Update();
+            }
+            else
+            {
+                // If the formula is incorrect, notify the user with a MessageBox showing potential errors.
+                if (Double.IsNaN(Double.Parse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value)))
                 {
-                    if (Double.IsNaN(Double.Parse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value)))
-                    {
-                        MessageBox.Show("Your formula has an error. This could be due to the following reasons:" +
-                            "\n    - One or more cells you're referring to is invalid or currently empty." +
-                            "\n    - The number of opening and closing parentheses are not the same." +
-                            "\n    - There are no arguments in your formula." +
-                            "\nPlease try again!");
-                    }
-                    else
-                    {
-                        userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].AddDependents(userSpreadsheet);
-                        userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Update();
-                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value;
-                    }
+                    MessageBox.Show("Your formula has an error. This could be due to the following reasons:" +
+                        "\n    - One or more cells you're referring to is invalid or currently empty." +
+                        "\n    - The number of opening and closing parentheses are not the same." +
+                        "\n    - There are no arguments in your formula." +
+                        "\nPlease try again!");
+                }
+                // Otherwise, evaluate the formula and show the results.
+                else
+                {
+                    userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].AddDependents(userSpreadsheet);
+                    userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Update();
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value;
                 }
             }
+
         }
 
         /// <summary>
@@ -87,27 +101,28 @@ namespace Spreadsheet_Minh_Nguyen
         }
 
         /// <summary>
-        /// When clicked, activates the demo.
+        /// When clicked, activates the demo. (Currently unused, but still left here since 
+        /// I'm not sure if I'm supposed to remove it)
         /// </summary>
         /// <param name="sender"> The button </param>
         /// <param name="e"> THe data of the button </param>
-        private void btnDemo_Click(object sender, EventArgs e)
-        {
-            Random rand = new Random();
-            // Demo part 1 - Set text in 50 random cells
-            for (int i = 0; i < 50; i++)
-            {
-                int randomRow = rand.Next(0, 50);
-                int randomColumn = rand.Next(0, 26);
-                userSpreadsheet.cellArray[randomRow, randomColumn].Text = "Scattered!";
-            }
+        //private void btnDemo_Click(object sender, EventArgs e)
+        //{
+        //    Random rand = new Random();
+        //    // Demo part 1 - Set text in 50 random cells
+        //    for (int i = 0; i < 50; i++)
+        //    {
+        //        int randomRow = rand.Next(0, 50);
+        //        int randomColumn = rand.Next(0, 26);
+        //        userSpreadsheet.cellArray[randomRow, randomColumn].Text = "Scattered!";
+        //    }
 
-            // Demo part 2 - Set text in every cell in column B and assign value of cells in column B to column A
-            for (int i = 0; i < userSpreadsheet.RowCount; i++)
-            {
-                userSpreadsheet.cellArray[i, 1].Text = "This is cell B" + (i + 1).ToString();
-                userSpreadsheet.cellArray[i, 0].Text = "=B" + (i + 1).ToString();
-            }
-        }
+        //    // Demo part 2 - Set text in every cell in column B and assign value of cells in column B to column A
+        //    for (int i = 0; i < userSpreadsheet.RowCount; i++)
+        //    {
+        //        userSpreadsheet.cellArray[i, 1].Text = "This is cell B" + (i + 1).ToString();
+        //        userSpreadsheet.cellArray[i, 0].Text = "=B" + (i + 1).ToString();
+        //    }
+        //}
     }
 }

@@ -9,6 +9,9 @@ using System.Data;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The abstract class for the spreadsheet cell.
+    /// </summary>
     public abstract class Cell : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
@@ -58,11 +61,14 @@ namespace CptS321
                     {
                         tempExpressionTree = new ExpressionTree(text.Substring(1));
                     }
+                    // Otherwise, create a new expression tree with the given text.
                     else
                     {
                         tempExpressionTree = new ExpressionTree(text);
-                    }
+                    }            
+                    // Convert the text to postfix notation for cell dependency searching
                     treeComponents = tempExpressionTree.ConvertToPostFix(tempExpressionTree.RawExpression).Split(' ');
+
                     OnPropertyChanged();
                 }
             }
@@ -79,23 +85,28 @@ namespace CptS321
         /// Sets the value for a cell.
         /// </summary>
         /// <param name="val"> the value to be set.</param>
-        /// <returns> the cell, with its value updated. </returns>
         internal void SetValue(string val)
         {
             value = val;
         }
 
+        /// <summary>
+        /// Code that will execute when the text of a cell is updated.
+        /// </summary>
+        /// <param name="value"> the new text value </param>
         public void OnPropertyChanged([CallerMemberName] string value = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(value));
-            isEventFired = true;
+            isEventFired = true; // signifies that the event has been fired.
         }
 
+        /// <summary>
+        /// Updates the cell, as well as all of the cell's dependents.
+        /// </summary>
         public void Update()
         {
             foreach (Cell cell in dependents)
             {
-
                 if (cell.IsEventFired == true)
                 {
                     OnPropertyChanged();
@@ -104,16 +115,27 @@ namespace CptS321
             }
         }
 
+        /// <summary>
+        /// Adds the dependents of a cell to its dependents list.
+        /// </summary>
+        /// <param name="spreadsheet"> the spreadsheet the cell is in </param>
         public void AddDependents(Spreadsheet spreadsheet)
         {
-            double test = 0;
+            double test = 0; // for the TryParse method below
+
             foreach (string component in treeComponents)
             {
+                // If the component is a variable referring to a cell
                 if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
                 {
+                    // Get the cell's row number and column number
                     int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
                     int columnNumber = component[0] - 65;
+
+                    // Add the cell to the current cell's dependency list.
                     dependents.Add(spreadsheet.cellArray[rowNumber, columnNumber]);
+
+                    // Also add all the cells that are dependent on each other to all depending cell's dependent lists.
                     foreach (Cell cell in dependents)
                     {
                         if (!cell.Dependents.Contains(this))
@@ -131,6 +153,7 @@ namespace CptS321
 
                 }
             }
+            // Updates all involved cells.
             foreach (Cell cell in Dependents)
             {
                 if (cell.IsEventFired == true)

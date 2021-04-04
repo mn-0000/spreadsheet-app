@@ -88,7 +88,7 @@ namespace CptS321.Tests
         [Test]
         public void TestInvalidReference()
         {
-            testSpreadsheet.cellArray[0, 0].Text = "=XX99";
+            testSpreadsheet.cellArray[0, 0].Text = "=X99";
             Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
         }
     }

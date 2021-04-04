@@ -164,10 +164,15 @@ namespace CptS321
             return postfixExpression.ToString();
         }
 
+        /// <summary>
+        /// Evaluates the formula given by a spreadsheet's cell array.
+        /// </summary>
+        /// <param name="cellArray"> The cell array of a spreadsheet </param>
+        /// <returns> The result of the evaluation </returns>
         public double EvaluateSpreadsheetFormula(Cell[,] cellArray)
         {
-            string postfixExpression = ConvertToPostFix(rawExpression);
             // needed variables
+            string postfixExpression = ConvertToPostFix(rawExpression);
             Stack<ExpressionTreeNode> nodeStack = new Stack<ExpressionTreeNode>();
             ConstantNode constantNode;
             VariableNode variableNode;
@@ -178,6 +183,7 @@ namespace CptS321
 
             foreach (string component in treeComponents)
             {
+                // If the incoming string is a parenthesis, the input is incorrect.
                 if ("()".Contains(component)) { return Double.NaN; }
                 // if the incoming string is a double, create a new constant node and push it to the stack.
                 if (double.TryParse(component, out test))
@@ -186,6 +192,7 @@ namespace CptS321
                     nodeStack.Push(constantNode);
                 }
                 // else if the incoming string is a variable name, create a new variable node and push it to the stack.
+                // returns Double.NaN if argument is null or out of range, 0 if argument is not a double.
                 else if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
                 {
                     try
@@ -203,7 +210,8 @@ namespace CptS321
                     }
                     catch (FormatException)
                     {
-                        return Double.NaN;
+                        constantNode = factory.CreateConstantNode(0);
+                        nodeStack.Push(constantNode);
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -224,3 +232,4 @@ namespace CptS321
         }
     }
 }
+

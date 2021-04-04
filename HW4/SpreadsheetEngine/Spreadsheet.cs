@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The class for the spreadsheet.
+    /// </summary>
     public class Spreadsheet : Cell
     {
         public event PropertyChangedEventHandler CellPropertyChanged = (sender, e) => { };
