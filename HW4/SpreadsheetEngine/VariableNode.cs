@@ -24,7 +24,6 @@ namespace CptS321
         {
             this.name = name;
             this.variables = variables;
-            
         }
 
         /// <summary>
@@ -34,12 +33,14 @@ namespace CptS321
         /// <returns></returns>
         public override double Evaluate()
         {
-            double value = 0.0;
             if (this.variables.ContainsKey(this.name))
             {
-                value = this.variables[this.name];
+                return this.variables[this.name];
             }
-            return value;
+            else
+            {
+                return double.NaN;
+            }
         }
 
     }

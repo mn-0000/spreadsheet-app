@@ -8,7 +8,7 @@ using System.Reflection;
 namespace CptS321
 {
     /// <summary>
-    /// The actual factory to create nodes. Will be unused until a later implementation.
+    /// The actual factory to create nodes.
     /// </summary>
     public class NodeFactory
     {
@@ -50,7 +50,7 @@ namespace CptS321
                         if (value is char)
                         {
                             char operatorSymbol = (char)value;
-                            onOperatorNode(operatorSymbol, type); // signals the constructor to add the operator to the dictionary
+                            operators.Add(operatorSymbol, type); // signals the constructor to add the operator to the dictionary
                         }
                     }
                 }

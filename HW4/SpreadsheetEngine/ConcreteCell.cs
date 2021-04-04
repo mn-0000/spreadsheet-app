@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CptS321
 {
+    /// <summary>
+    /// The concrete class for the spreadsheet cell.
+    /// </summary>
     public class ConcreteCell : Cell
     {
         /// <summary>
