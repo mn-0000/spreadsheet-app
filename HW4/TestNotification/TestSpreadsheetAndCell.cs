@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CptS321.Tests
 {
@@ -90,6 +91,36 @@ namespace CptS321.Tests
         {
             testSpreadsheet.cellArray[0, 0].Text = "=X99";
             Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
+        }
+
+        [Test]
+        public void TestAddActions()
+        {
+            Action action1 = () => { testSpreadsheet.cellArray[0, 0].Text = "1"; };
+            Action action2 = () => { testSpreadsheet.cellArray[0, 0].Text = "A2"; };
+            testSpreadsheet.AddUndo(action1, 4);
+            testSpreadsheet.AddUndo(action2, 7);
+            Assert.AreEqual(2, testSpreadsheet.UndoCount);
+            Assert.AreEqual(7, testSpreadsheet.NextUndoClassification);
+            Action action3 = () => { testSpreadsheet.cellArray[0, 1].Text = "B3"; };
+            testSpreadsheet.AddRedo(action3, 2);
+            Assert.AreEqual(1, testSpreadsheet.RedoCount);
+            Assert.AreEqual(2, testSpreadsheet.NextRedoClassification);
+        }
+
+        [Test]
+        public void TestUndoRedo()
+        {
+            Action action4 = () => { testSpreadsheet.cellArray[0, 0].Text = "X"; };
+            Action action5 = () => { testSpreadsheet.cellArray[0, 0].Text = "Bye"; };
+            testSpreadsheet.AddUndo(action4, 1);
+            testSpreadsheet.AddUndo(action5, 2);
+            testSpreadsheet.Undo();
+            Assert.AreEqual(0, testSpreadsheet.UndoCount);
+            Assert.AreEqual(2, testSpreadsheet.RedoCount);
+            testSpreadsheet.Redo();
+            Assert.AreEqual(2, testSpreadsheet.UndoCount);
+            Assert.AreEqual(0, testSpreadsheet.RedoCount);
         }
     }
 }
