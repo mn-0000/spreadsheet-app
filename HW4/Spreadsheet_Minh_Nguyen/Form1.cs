@@ -17,6 +17,14 @@ namespace Spreadsheet_Minh_Nguyen
     public partial class Form1 : Form
     {
         public Spreadsheet userSpreadsheet;
+        private Stack<Func<object>> undoStack = new Stack<Func<object>>();
+        private Stack<Func<object>> redoStack = new Stack<Func<object>>();
+        private Action mostRecentAction;
+        private Action initialState;
+        private Action initialText;
+        private Action mostRecentText;
+        private DataGridViewSelectedCellCollection previouslySelectedCells;
+
         public Form1()
         {
             userSpreadsheet = new Spreadsheet(50, 26); // initialize spreadsheet
@@ -36,6 +44,7 @@ namespace Spreadsheet_Minh_Nguyen
                 dataGridView1.Rows.Add();
                 dataGridView1.Rows[i].HeaderCell.Value = (i + 1).ToString();
             }
+
         }
 
         /// <summary>
@@ -56,37 +65,23 @@ namespace Spreadsheet_Minh_Nguyen
         /// <param name="e"> the data of the DataGridView cell that has its text changed. </param>
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            string previousText = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text;
             double test = 0; // for the TryParse method
-
-            // sets the text of the cell
-            userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-
-            // If the cell is empty or is both not a double and not a formula, update the dependent cells.
-            if (String.IsNullOrEmpty(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text) 
-                || (!double.TryParse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text, out test) && !userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text.StartsWith("=")))
+            initialText = () =>
             {
-                foreach (Cell dependent in userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Dependents) dependent.Update();
-            }
-            else
+                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].CellTextChange(this, dataGridView1, previousText)();
+            };
+            userSpreadsheet.AddUndo(initialText, 1);
+            string currentText = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+            mostRecentText = () =>
             {
-                // If the formula is incorrect, notify the user with a MessageBox showing potential errors.
-                if (Double.IsNaN(Double.Parse(userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value)))
-                {
-                    MessageBox.Show("Your formula has an error. This could be due to the following reasons:" +
-                        "\n    - One or more cells you're referring to is invalid or currently empty." +
-                        "\n    - The number of opening and closing parentheses are not the same." +
-                        "\n    - There are no arguments in your formula." +
-                        "\nPlease try again!");
-                }
-                // Otherwise, evaluate the formula and show the results.
-                else
-                {
-                    userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].AddDependents(userSpreadsheet);
-                    userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Update();
-                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Value;
-                }
-            }
+                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].CellTextChange(this, dataGridView1, currentText)();
+            };
+            userSpreadsheet.AddUndo(mostRecentText, 1);
+            mostRecentText.Invoke();
 
+            undoToolStripMenuItem.Enabled = true;
+            undoToolStripMenuItem.Text = "Undo cell text change";
         }
 
         /// <summary>
@@ -98,8 +93,99 @@ namespace Spreadsheet_Minh_Nguyen
         {
             Cell cell = (sender as Cell);
             dataGridView1.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = cell.Value;
+            dataGridView1.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Style.BackColor = Color.FromArgb((int)cell.BGColor);
         }
 
+        private void changeCellBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog cellColorSelection = new ColorDialog();
+            cellColorSelection.Color = dataGridView1.CurrentCell.Style.BackColor;
+
+            if (cellColorSelection.ShowDialog() == DialogResult.OK)
+            {
+                DataGridViewCell currentCell = dataGridView1.CurrentCell;
+
+                DataGridViewSelectedCellCollection selectedCells = dataGridView1.SelectedCells;
+                List<Color> originalBackground = new List<Color>();
+                foreach (DataGridViewCell cell in selectedCells)
+                {
+                    if (cell.Style.BackColor == Color.Empty)
+                    {
+                        originalBackground.Add(Color.White);
+                    }
+                    else
+                    {
+                        originalBackground.Add(cell.Style.BackColor);
+                    }
+                }
+
+                initialState = () =>
+                {
+                    for (int i = 0; i < selectedCells.Count; i++)
+                    {
+                        selectedCells[i].CellColorChange(this, originalBackground[i])();
+                    }
+                };
+                userSpreadsheet.AddUndo(initialState, 0);
+                previouslySelectedCells = selectedCells;
+
+                mostRecentAction = () =>
+                {
+                    foreach (DataGridViewCell cell in selectedCells)
+                        cell.CellColorChange(this, cellColorSelection.Color)();
+                };
+                userSpreadsheet.AddUndo(mostRecentAction, 0);
+                mostRecentAction.Invoke();
+
+                undoToolStripMenuItem.Enabled = true;
+                undoToolStripMenuItem.Text = "Undo cell color change";
+            }
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            redoToolStripMenuItem.Enabled = true;
+            userSpreadsheet.Undo();
+            if (userSpreadsheet.UndoCount == 0)
+            {
+                undoToolStripMenuItem.Enabled = false;
+                undoToolStripMenuItem.Text = "Undo";
+            }
+            else
+            {        
+                DetermineActionText(userSpreadsheet.NextUndoClassification, undoToolStripMenuItem);
+            }
+            DetermineActionText(userSpreadsheet.NextRedoClassification, redoToolStripMenuItem);
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            undoToolStripMenuItem.Enabled = true;
+            userSpreadsheet.Redo();
+            if (userSpreadsheet.RedoCount == 0)
+            {
+                redoToolStripMenuItem.Enabled = false;
+                redoToolStripMenuItem.Text = "Redo";
+            }
+            else
+            {
+                DetermineActionText(userSpreadsheet.NextRedoClassification, redoToolStripMenuItem);       
+            }
+            DetermineActionText(userSpreadsheet.NextUndoClassification, undoToolStripMenuItem);
+        }
+
+        private void DetermineActionText(int classification, ToolStripMenuItem item)
+        {
+            switch (classification)
+            {
+                case 0:
+                    item.Text = item.Tag + " cell color change";
+                    break;
+                case 1:
+                    item.Text = item.Tag + " cell text change";
+                    break;
+            }
+        }
         /// <summary>
         /// When clicked, activates the demo. (Currently unused, but still left here since 
         /// I'm not sure if I'm supposed to remove it)
@@ -124,5 +210,7 @@ namespace Spreadsheet_Minh_Nguyen
         //        userSpreadsheet.cellArray[i, 0].Text = "=B" + (i + 1).ToString();
         //    }
         //}
+
     }
+
 }
