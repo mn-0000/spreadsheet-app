@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,12 +15,22 @@ namespace CptS321
     /// </summary>
     public class Spreadsheet : Cell
     {
+        private Stack<Tuple<Action, int>> undoStack = new Stack<Tuple<Action, int>>();
+        private Stack<Tuple<Action, int>> redoStack = new Stack<Tuple<Action, int>>();
+        private Action currentUndo;
+        private Action currentRedo;
         public event PropertyChangedEventHandler CellPropertyChanged = (sender, e) => { };
 
         // Member variables
         public Cell[,] cellArray;
         public int RowCount { get; }
         public int ColumnCount { get; }
+
+        public int NextUndoClassification { get { return undoStack.Peek().Item2; } }
+        public int NextRedoClassification { get { return redoStack.Peek().Item2; } }
+
+        public int UndoCount { get { return undoStack.Count; } }
+        public int RedoCount { get { return redoStack.Count; } }
 
         /// <summary>
         /// Constructor for the spreadsheet class.
@@ -65,7 +76,7 @@ namespace CptS321
             }
             // If the sender cell's text starts with '=', perform evaluation.
             else
-            {   
+            {
                 // Create a new expression tree with the given formula to access its methods.
                 ExpressionTree expressionTree = new ExpressionTree(cell.Text.Substring(1));
                 // Evaluates the formula, sets the value for the cell.
@@ -75,6 +86,30 @@ namespace CptS321
             CellPropertyChanged(sender, e);
         }
 
-        
+        public void AddUndo(Action action, int classification)
+        {
+            undoStack.Push(Tuple.Create(action, classification));
+        }
+
+        public void Undo()
+        {
+            redoStack.Push(undoStack.Pop());
+            currentUndo = undoStack.Peek().Item1;
+            currentUndo.Invoke();
+            redoStack.Push(undoStack.Pop());
+        }
+
+        public void AddRedo(Action action, int classification)
+        {
+            redoStack.Push(Tuple.Create(action, classification));
+        }
+
+        public void Redo()
+        {
+            undoStack.Push(redoStack.Pop());
+            currentRedo = redoStack.Peek().Item1;
+            currentRedo.Invoke();
+            undoStack.Push(redoStack.Pop());
+        }
     }
 }
