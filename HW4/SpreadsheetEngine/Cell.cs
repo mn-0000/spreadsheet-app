@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Data;
+using System.Drawing;
 
 namespace CptS321
 {
@@ -26,9 +27,23 @@ namespace CptS321
         protected ExpressionTree tempExpressionTree;
         protected string postfixExpression;
         protected string[] treeComponents;
+        protected uint color = 0xFFFFFFFF;
 
         public int RowIndex { get { return rowIndex; } }
         public int ColumnIndex { get { return columnIndex; } }
+
+        public uint BGColor
+        {
+            get
+            {
+                return color;
+            }
+            set
+            {
+                color = value;
+                OnPropertyChanged();
+            }
+        }
 
         public List<Cell> Dependents { get { return dependents; } }
         public string[] TreeComponents { get { return treeComponents; } }
@@ -52,8 +67,8 @@ namespace CptS321
             {
                 if (text == value) { return; }
                 text = value;
-       
-                if (value == null) { return; } // if the new value is null, simply return
+
+                if (value == null) { OnPropertyChanged(); }
                 else
                 {
                     // If the text is a formula, create a new expression tree with the equal sign omitted.
@@ -65,7 +80,7 @@ namespace CptS321
                     else
                     {
                         tempExpressionTree = new ExpressionTree(text);
-                    }            
+                    }
                     // Convert the text to postfix notation for cell dependency searching
                     treeComponents = tempExpressionTree.ConvertToPostFix(tempExpressionTree.RawExpression).Split(' ');
 
