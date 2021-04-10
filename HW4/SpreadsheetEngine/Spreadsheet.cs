@@ -15,14 +15,14 @@ namespace CptS321
     /// </summary>
     public class Spreadsheet : Cell
     {
+        // Member variables
         private Stack<Tuple<Action, int>> undoStack = new Stack<Tuple<Action, int>>();
         private Stack<Tuple<Action, int>> redoStack = new Stack<Tuple<Action, int>>();
         private Action currentUndo;
         private Action currentRedo;
         public event PropertyChangedEventHandler CellPropertyChanged = (sender, e) => { };
-
-        // Member variables
         public Cell[,] cellArray;
+
         public int RowCount { get; }
         public int ColumnCount { get; }
 
@@ -86,29 +86,51 @@ namespace CptS321
             CellPropertyChanged(sender, e);
         }
 
+        /// <summary>
+        /// Adds an undoable action to the undo stack.
+        /// </summary>
+        /// <param name="action"> The action to be added to the undo stack. </param>
+        /// <param name="classification"> An integer representing what type of action is provided. </param>
         public void AddUndo(Action action, int classification)
         {
             undoStack.Push(Tuple.Create(action, classification));
         }
 
+        /// <summary>
+        /// Undoes an action.
+        /// </summary>
         public void Undo()
         {
-            redoStack.Push(undoStack.Pop());
+            // Pop the last action from undoStack and push to redoStack
+            redoStack.Push(undoStack.Pop()); 
+            // Get the previous action and execute it.
             currentUndo = undoStack.Peek().Item1;
             currentUndo.Invoke();
+            // Pop the previous action from undoStack and push to redoStack
             redoStack.Push(undoStack.Pop());
         }
 
+        /// <summary>
+        /// Adds an redoable action to the undo stack.
+        /// </summary>
+        /// <param name="action"> The action to be added to the redo stack. </param>
+        /// <param name="classification"> An integer representing what type of action is provided. </param>
         public void AddRedo(Action action, int classification)
         {
             redoStack.Push(Tuple.Create(action, classification));
         }
 
+        /// <summary>
+        /// Redoes an action.
+        /// </summary>
         public void Redo()
         {
+            // Pop the previous action from undoStack and push to undoStack
             undoStack.Push(redoStack.Pop());
+            // Get the last undo action and execute it.
             currentRedo = redoStack.Peek().Item1;
             currentRedo.Invoke();
+            // Pop the last undo action from undoStack and push to undoStack
             undoStack.Push(redoStack.Pop());
         }
     }

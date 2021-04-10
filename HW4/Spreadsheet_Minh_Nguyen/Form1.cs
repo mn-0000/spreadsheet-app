@@ -17,13 +17,10 @@ namespace Spreadsheet_Minh_Nguyen
     public partial class Form1 : Form
     {
         public Spreadsheet userSpreadsheet;
-        private Stack<Func<object>> undoStack = new Stack<Func<object>>();
-        private Stack<Func<object>> redoStack = new Stack<Func<object>>();
         private Action mostRecentAction;
         private Action initialState;
         private Action initialText;
         private Action mostRecentText;
-        private DataGridViewSelectedCellCollection previouslySelectedCells;
 
         public Form1()
         {
@@ -44,7 +41,6 @@ namespace Spreadsheet_Minh_Nguyen
                 dataGridView1.Rows.Add();
                 dataGridView1.Rows[i].HeaderCell.Value = (i + 1).ToString();
             }
-
         }
 
         /// <summary>
@@ -65,23 +61,30 @@ namespace Spreadsheet_Minh_Nguyen
         /// <param name="e"> the data of the DataGridView cell that has its text changed. </param>
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            string previousText = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text;
-            double test = 0; // for the TryParse method
+
+            string previousText = userSpreadsheet.cellArray[e.RowIndex, e.ColumnIndex].Text; // the previous state's text.
+            // Create a backup of the cell's previous state, and pushes it to the spreadsheet's undoStack.
             initialText = () =>
             {
                 dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].CellTextChange(this, dataGridView1, previousText)();
             };
+            // Add the backup to the spreadsheet's undoStack.
             userSpreadsheet.AddUndo(initialText, 1);
-            string currentText = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+
+            string currentText = (string)dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value; // the current text.
+            // Create a block of actions to be executed when the text has been changed.
             mostRecentText = () =>
             {
                 dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].CellTextChange(this, dataGridView1, currentText)();
             };
+            // Add the block of actions to the spreadsheet's undoStack.
             userSpreadsheet.AddUndo(mostRecentText, 1);
+            // Execute the actions block.
             mostRecentText.Invoke();
 
+            // Enable the Undo option and set its text.
             undoToolStripMenuItem.Enabled = true;
-            undoToolStripMenuItem.Text = "Undo cell text change";
+            undoToolStripMenuItem.Text = "Undo text change";
         }
 
         /// <summary>
@@ -98,17 +101,22 @@ namespace Spreadsheet_Minh_Nguyen
 
         private void changeCellBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Create a new ColorDialog and set the default color choice to the cell's current color.
             ColorDialog cellColorSelection = new ColorDialog();
             cellColorSelection.Color = dataGridView1.CurrentCell.Style.BackColor;
 
+            // If the user actually decides to change the cell's back color, execute the following code.
             if (cellColorSelection.ShowDialog() == DialogResult.OK)
             {
-                DataGridViewCell currentCell = dataGridView1.CurrentCell;
+                DataGridViewSelectedCellCollection selectedCells = dataGridView1.SelectedCells; // get list of cells selected for color change.
 
-                DataGridViewSelectedCellCollection selectedCells = dataGridView1.SelectedCells;
+                // Create a list containing the colors of the selected cells.
                 List<Color> originalBackground = new List<Color>();
                 foreach (DataGridViewCell cell in selectedCells)
                 {
+                    // (In the case of an undo) If a cell is previously empty and had its color changed,
+                    // add the color white to the list as opposed to Color.Empty (which will cause
+                    // undesired changes)
                     if (cell.Style.BackColor == Color.Empty)
                     {
                         originalBackground.Add(Color.White);
@@ -119,6 +127,7 @@ namespace Spreadsheet_Minh_Nguyen
                     }
                 }
 
+                // Create a backup of the selected cell(s)' previous states and add it to the spreadsheet's undoStack.
                 initialState = () =>
                 {
                     for (int i = 0; i < selectedCells.Count; i++)
@@ -127,41 +136,57 @@ namespace Spreadsheet_Minh_Nguyen
                     }
                 };
                 userSpreadsheet.AddUndo(initialState, 0);
-                previouslySelectedCells = selectedCells;
 
+                // Create a block of code that will be executed in order to change the cell(s)' back color,
+                // and add it to the spreadsheet's undoStack.
                 mostRecentAction = () =>
                 {
                     foreach (DataGridViewCell cell in selectedCells)
                         cell.CellColorChange(this, cellColorSelection.Color)();
                 };
                 userSpreadsheet.AddUndo(mostRecentAction, 0);
-                mostRecentAction.Invoke();
+                mostRecentAction.Invoke(); // execute the above block of code.
 
+                // Enable the Undo option and set its text.
                 undoToolStripMenuItem.Enabled = true;
-                undoToolStripMenuItem.Text = "Undo cell color change";
+                undoToolStripMenuItem.Text = "Undo color change";
             }
         }
 
+        /// <summary>
+        /// Code that will be executed when the user opts to undo an action.
+        /// </summary>
+        /// <param name="sender"> The Undo option. </param>
+        /// <param name="e"> The Undo option's properties. </param>
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            redoToolStripMenuItem.Enabled = true;
+            redoToolStripMenuItem.Enabled = true; // performing an undo means that a redo is possible, so enable the Redo control
             userSpreadsheet.Undo();
+            // If there's no actions left in the spreadsheet's undoStack, disable it.
             if (userSpreadsheet.UndoCount == 0)
             {
                 undoToolStripMenuItem.Enabled = false;
                 undoToolStripMenuItem.Text = "Undo";
             }
             else
-            {        
+            {
+                // Determines what the undo option's text would be after the undo.
                 DetermineActionText(userSpreadsheet.NextUndoClassification, undoToolStripMenuItem);
             }
+            // Determines what the redo option's text would be after the undo.
             DetermineActionText(userSpreadsheet.NextRedoClassification, redoToolStripMenuItem);
         }
 
+        /// <summary>
+        /// Code that will be executed when the user opts to redo an action.
+        /// </summary>
+        /// <param name="sender"> The Redo option. </param>
+        /// <param name="e"> The Redo option's properties. </param>
         private void redoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            undoToolStripMenuItem.Enabled = true;
+            undoToolStripMenuItem.Enabled = true; // performing a redo means that an undo is possible, so enable the Undo control
             userSpreadsheet.Redo();
+            // If there's no actions left in the spreadsheet's redoStack, disable it.
             if (userSpreadsheet.RedoCount == 0)
             {
                 redoToolStripMenuItem.Enabled = false;
@@ -169,23 +194,31 @@ namespace Spreadsheet_Minh_Nguyen
             }
             else
             {
-                DetermineActionText(userSpreadsheet.NextRedoClassification, redoToolStripMenuItem);       
+                // Determines what the redo option's text would be after the redo.
+                DetermineActionText(userSpreadsheet.NextRedoClassification, redoToolStripMenuItem);
             }
+            // Determines what the undo option's text would be after the redo.
             DetermineActionText(userSpreadsheet.NextUndoClassification, undoToolStripMenuItem);
         }
 
+        /// <summary>
+        /// Sets the undo/redo options' text.
+        /// </summary>
+        /// <param name="classification"> An integer representing the type of action. </param>
+        /// <param name="item"> The menu item to have its text changed. </param>
         private void DetermineActionText(int classification, ToolStripMenuItem item)
         {
             switch (classification)
             {
                 case 0:
-                    item.Text = item.Tag + " cell color change";
+                    item.Text = item.Tag + " color change";
                     break;
                 case 1:
-                    item.Text = item.Tag + " cell text change";
+                    item.Text = item.Tag + " text change";
                     break;
             }
         }
+
         /// <summary>
         /// When clicked, activates the demo. (Currently unused, but still left here since 
         /// I'm not sure if I'm supposed to remove it)

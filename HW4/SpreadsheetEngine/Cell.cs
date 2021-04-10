@@ -27,7 +27,7 @@ namespace CptS321
         protected ExpressionTree tempExpressionTree;
         protected string postfixExpression;
         protected string[] treeComponents;
-        protected uint color = (uint)Color.White.ToArgb();
+        protected uint color = 0xFFFFFFFF;
 
         public int RowIndex { get { return rowIndex; } }
         public int ColumnIndex { get { return columnIndex; } }
@@ -68,7 +68,7 @@ namespace CptS321
                 if (text == value) { return; }
                 text = value;
 
-                if (value == null) { OnPropertyChanged(); } // if the new value is null, simply return
+                if (value == null) { OnPropertyChanged(); }
                 else
                 {
                     // If the text is a formula, create a new expression tree with the equal sign omitted.
