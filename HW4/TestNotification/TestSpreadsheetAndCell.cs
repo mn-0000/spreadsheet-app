@@ -4,12 +4,13 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CptS321.Tests
 {
     [TestFixture]
-    public class TestClass
+    public class SpreadsheetAndCellTests
     {
         Spreadsheet testSpreadsheet;
 
@@ -121,6 +122,29 @@ namespace CptS321.Tests
             testSpreadsheet.Redo();
             Assert.AreEqual(2, testSpreadsheet.UndoCount);
             Assert.AreEqual(0, testSpreadsheet.RedoCount);
+        }
+
+        [Test]
+        public void TestXMLSave()
+        {
+            string filePath = "./backup.xml";
+            testSpreadsheet.Save(testSpreadsheet, filePath);
+            FileAssert.Exists("./backup.xml");
+        }
+
+        [Test]
+        public void TestXMLLoad()
+        {
+            string filePath = "./backup2.xml";
+            testSpreadsheet.Save(testSpreadsheet, filePath);
+            testSpreadsheet.cellArray[0, 0].Text = "17";
+            testSpreadsheet.cellArray[0, 1].Text = "=A1";
+            testSpreadsheet.cellArray[0, 2].BGColor = 0xFF004466;
+            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            testSpreadsheet.Load(fileStream, testSpreadsheet);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 0].Text);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 1].Text);
+            Assert.AreEqual(0xFFFFFFFF, testSpreadsheet.cellArray[0, 0].BGColor);
         }
     }
 }
