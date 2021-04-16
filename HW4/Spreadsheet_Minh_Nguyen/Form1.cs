@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -216,6 +217,43 @@ namespace Spreadsheet_Minh_Nguyen
                 case 1:
                     item.Text = item.Tag + " text change";
                     break;
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "XML files (*.xml)|*.xml";
+            saveFileDialog.RestoreDirectory = true;
+            
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string savePath = saveFileDialog.FileName;
+                userSpreadsheet.Save(userSpreadsheet, savePath);
+            }
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //dataGridView1;
+            
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            openFileDialog.Filter = "XML files (*.xml)|*.xml";
+            openFileDialog.RestoreDirectory = true; // restores the last directory the user have accessed.
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                for (int i = 0; i < userSpreadsheet.RowCount; i++)
+                {
+                    for (int j = 0; j < userSpreadsheet.ColumnCount; j++)
+                    {
+                        userSpreadsheet.cellArray[i, j].Text = "";
+                        userSpreadsheet.cellArray[i, j].BGColor = 0xFFFFFFFF;
+                    }
+                }
+                FileStream fileStream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
+                userSpreadsheet.Load(fileStream, userSpreadsheet);
             }
         }
 

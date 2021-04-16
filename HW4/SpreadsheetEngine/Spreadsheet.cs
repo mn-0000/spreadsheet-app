@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CptS321
 {
@@ -102,7 +105,7 @@ namespace CptS321
         public void Undo()
         {
             // Pop the last action from undoStack and push to redoStack
-            redoStack.Push(undoStack.Pop()); 
+            redoStack.Push(undoStack.Pop());
             // Get the previous action and execute it.
             currentUndo = undoStack.Peek().Item1;
             currentUndo.Invoke();
@@ -132,6 +135,81 @@ namespace CptS321
             currentRedo.Invoke();
             // Pop the last undo action from undoStack and push to undoStack
             undoStack.Push(redoStack.Pop());
+        }
+
+        public void Save(Spreadsheet spreadsheet, string filePath)
+        {
+
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "\t";
+            XmlWriter xmlWriter = XmlWriter.Create(filePath, settings);
+            xmlWriter.WriteStartDocument();
+            xmlWriter.WriteStartElement("spreadsheet");
+            foreach (ConcreteCell cell in spreadsheet.cellArray)
+            {
+                if (cell.Text != "" || cell.BGColor != 0xFFFFFFFF)
+                {
+                    StringBuilder cellName = new StringBuilder();
+                    cellName.Append(Convert.ToChar(cell.ColumnIndex + 65));
+                    cellName.Append((cell.RowIndex + 1).ToString());
+
+                    xmlWriter.WriteStartElement("cell");
+
+                    xmlWriter.WriteAttributeString("name", cellName.ToString());
+                    xmlWriter.WriteStartElement("text");
+                    xmlWriter.WriteString(cell.Text);
+                    xmlWriter.WriteEndElement();
+
+                    xmlWriter.WriteStartElement("bgcolor");
+                    xmlWriter.WriteString(cell.BGColor.ToString("X"));
+                    xmlWriter.WriteEndElement();
+
+                    xmlWriter.WriteEndElement();
+                }
+            }
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+        }
+
+        public void Load(FileStream fileStream, Spreadsheet spreadsheet)
+        {
+            undoStack.Clear();
+            redoStack.Clear();
+            int rowIndex = 0;
+            int columnIndex = 0;
+            string cellText = "";
+            uint color = 0xFFFFFFFF;
+            using (XmlReader reader = XmlReader.Create(fileStream))
+            {
+                while (reader.Read())
+                {
+                    switch (reader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            switch (reader.Name)
+                            {
+                                case "cell":
+                                    string cellName = reader.GetAttribute("name");
+                                    columnIndex = cellName[0] - 65;
+                                    rowIndex = cellName[1] - 49;
+                                    break;
+
+                                case "text":
+                                    cellText = reader.ReadElementContentAsString();
+                                    spreadsheet.cellArray[rowIndex, columnIndex].Text = cellText;
+                                    break;
+
+                                case "bgcolor":
+                                    color = uint.Parse(reader.ReadElementContentAsString(), System.Globalization.NumberStyles.HexNumber);
+                                    spreadsheet.cellArray[rowIndex, columnIndex].BGColor = color;
+                                    break;
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 }
