@@ -211,6 +211,7 @@ namespace CptS321
                     {
                         // Only process nodes that are elements.
                         case XmlNodeType.Element:
+                            // Try-catch statement is used to safeguard bad cells (ex: A66) in XML file
                             try
                             {
                                 // Only process the necessary attributes and elements.
