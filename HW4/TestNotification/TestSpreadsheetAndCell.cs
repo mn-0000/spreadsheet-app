@@ -94,6 +94,10 @@ namespace CptS321.Tests
             Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the program accurately built
+        /// the undo/redo stacks.
+        /// </summary>
         [Test]
         public void TestAddActions()
         {
@@ -109,6 +113,10 @@ namespace CptS321.Tests
             Assert.AreEqual(2, testSpreadsheet.NextRedoClassification);
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the program
+        /// performed undo/redo correctly.
+        /// </summary>
         [Test]
         public void TestUndoRedo()
         {
@@ -124,6 +132,10 @@ namespace CptS321.Tests
             Assert.AreEqual(0, testSpreadsheet.RedoCount);
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether an XML file with
+        /// the given name was successfully created by the Save method.
+        /// </summary>
         [Test]
         public void TestXMLSave()
         {
@@ -132,6 +144,10 @@ namespace CptS321.Tests
             FileAssert.Exists("./backup.xml");
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the XML file was
+        /// loaded properly and the cells' new properties were applied.
+        /// </summary>
         [Test]
         public void TestXMLLoad()
         {
@@ -144,7 +160,7 @@ namespace CptS321.Tests
             testSpreadsheet.Load(fileStream, testSpreadsheet);
             Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 0].Text);
             Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 1].Text);
-            Assert.AreEqual(0xFFFFFFFF, testSpreadsheet.cellArray[0, 0].BGColor);
+            Assert.AreEqual(0xFFFFFFFF, testSpreadsheet.cellArray[0, 2].BGColor);
         }
     }
 }

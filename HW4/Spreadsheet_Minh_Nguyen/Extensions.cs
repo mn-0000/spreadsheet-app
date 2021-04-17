@@ -42,7 +42,7 @@ namespace Spreadsheet_Minh_Nguyen
         /// <returns> A block of code that will be executed when called from the given form. </returns>
         public static Func<DataGridViewCell> CellTextChange(this DataGridViewCell cell, Form1 form1, DataGridView dataGridView, string text)
         {
-            double test = 0; // for the TryParse function
+            double test; // for the TryParse function
             return () =>
             {
                 // Sets the text of the cell.

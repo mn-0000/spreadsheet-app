@@ -20,7 +20,6 @@ namespace CptS321
         {
             rowIndex = RowIndex;
             columnIndex = ColumnIndex;
-
         }
     }
 }
