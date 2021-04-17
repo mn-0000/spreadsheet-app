@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -216,6 +217,52 @@ namespace Spreadsheet_Minh_Nguyen
                 case 1:
                     item.Text = item.Tag + " text change";
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Code that will be executed if the user opts to save the current spreadsheet.
+        /// </summary>
+        /// <param name="sender"> The save option. </param>
+        /// <param name="e"> The save option's properties </param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "XML files (*.xml)|*.xml"; // only allow user to save in xml format
+            saveFileDialog.RestoreDirectory = true; // restore last used directory for convenience
+            
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string savePath = saveFileDialog.FileName;
+                userSpreadsheet.Save(userSpreadsheet, savePath);
+            }
+        }
+
+        /// <summary>
+        /// Code that will be executed if the user opts to load a saved spreadsheet.
+        /// </summary>
+        /// <param name="sender"> The load option. </param>
+        /// <param name="e"> The load option's properties </param>
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "XML files (*.xml)|*.xml"; // only allow the user to select a valid xml file.
+            openFileDialog.RestoreDirectory = true; // restore last used directory for convenience
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                for (int i = 0; i < userSpreadsheet.RowCount; i++)
+                {
+                    for (int j = 0; j < userSpreadsheet.ColumnCount; j++)
+                    {
+                        // Reset the spreadsheet's cells to their default prior to loading.
+                        userSpreadsheet.cellArray[i, j].Text = "";
+                        userSpreadsheet.cellArray[i, j].BGColor = 0xFFFFFFFF;
+
+                    }
+                }
+                FileStream fileStream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
+                userSpreadsheet.Load(fileStream, userSpreadsheet);
             }
         }
 

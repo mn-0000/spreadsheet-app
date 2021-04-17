@@ -4,12 +4,13 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CptS321.Tests
 {
     [TestFixture]
-    public class TestClass
+    public class SpreadsheetAndCellTests
     {
         Spreadsheet testSpreadsheet;
 
@@ -93,6 +94,10 @@ namespace CptS321.Tests
             Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks if the program accurately built
+        /// the undo/redo stacks.
+        /// </summary>
         [Test]
         public void TestAddActions()
         {
@@ -108,6 +113,10 @@ namespace CptS321.Tests
             Assert.AreEqual(2, testSpreadsheet.NextRedoClassification);
         }
 
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the program
+        /// performed undo/redo correctly.
+        /// </summary>
         [Test]
         public void TestUndoRedo()
         {
@@ -121,6 +130,37 @@ namespace CptS321.Tests
             testSpreadsheet.Redo();
             Assert.AreEqual(2, testSpreadsheet.UndoCount);
             Assert.AreEqual(0, testSpreadsheet.RedoCount);
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether an XML file with
+        /// the given name was successfully created by the Save method.
+        /// </summary>
+        [Test]
+        public void TestXMLSave()
+        {
+            string filePath = "./backup.xml";
+            testSpreadsheet.Save(testSpreadsheet, filePath);
+            FileAssert.Exists("./backup.xml");
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the XML file was
+        /// loaded properly and the cells' new properties were applied.
+        /// </summary>
+        [Test]
+        public void TestXMLLoad()
+        {
+            string filePath = "./backup2.xml";
+            testSpreadsheet.Save(testSpreadsheet, filePath);
+            testSpreadsheet.cellArray[0, 0].Text = "17";
+            testSpreadsheet.cellArray[0, 1].Text = "=A1";
+            testSpreadsheet.cellArray[0, 2].BGColor = 0xFF004466;
+            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            testSpreadsheet.Load(fileStream, testSpreadsheet);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 0].Text);
+            Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 1].Text);
+            Assert.AreEqual(0xFFFFFFFF, testSpreadsheet.cellArray[0, 2].BGColor);
         }
     }
 }

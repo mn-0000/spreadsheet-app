@@ -29,6 +29,7 @@ namespace CptS321
         protected string[] treeComponents;
         protected uint color = 0xFFFFFFFF;
 
+
         public int RowIndex { get { return rowIndex; } }
         public int ColumnIndex { get { return columnIndex; } }
 

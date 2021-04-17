@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CptS321
 {
@@ -102,7 +105,7 @@ namespace CptS321
         public void Undo()
         {
             // Pop the last action from undoStack and push to redoStack
-            redoStack.Push(undoStack.Pop()); 
+            redoStack.Push(undoStack.Pop());
             // Get the previous action and execute it.
             currentUndo = undoStack.Peek().Item1;
             currentUndo.Invoke();
@@ -132,6 +135,119 @@ namespace CptS321
             currentRedo.Invoke();
             // Pop the last undo action from undoStack and push to undoStack
             undoStack.Push(redoStack.Pop());
+        }
+
+        /// <summary>
+        /// Saves the current spreadsheet to an XML filw with the given file name.
+        /// </summary>
+        /// <param name="spreadsheet"> The spreadsheet to be saved </param>
+        /// <param name="filePath"> The file path (containing the file name) where the file will be stored </param>
+        public void Save(Spreadsheet spreadsheet, string filePath)
+        {
+            // Create settings for the XML file.
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "\t";
+
+            XmlWriter xmlWriter = XmlWriter.Create(filePath, settings);
+            xmlWriter.WriteStartDocument();
+            xmlWriter.WriteStartElement("spreadsheet"); // start spreadsheet node
+            foreach (ConcreteCell cell in spreadsheet.cellArray)
+            {
+                // Check if the cell's two main properties differ from their default values.
+                // Only those that have their properties changed will be added to the XML file.
+                if (cell.Text != "" || cell.BGColor != 0xFFFFFFFF)
+                {
+                    // Get the cell name
+                    StringBuilder cellName = new StringBuilder();
+                    cellName.Append(Convert.ToChar(cell.ColumnIndex + 65));
+                    cellName.Append((cell.RowIndex + 1).ToString());
+
+                    xmlWriter.WriteStartElement("cell"); // start cell node
+                    xmlWriter.WriteAttributeString("name", cellName.ToString()); // name of the cell
+
+                    // Write text node for the current cell
+                    xmlWriter.WriteStartElement("text");
+                    xmlWriter.WriteString(cell.Text);
+                    xmlWriter.WriteEndElement();
+
+                    // Write background color node for the current cell
+                    xmlWriter.WriteStartElement("bgcolor");
+                    xmlWriter.WriteString(cell.BGColor.ToString("X")); // store color in hex format
+                    xmlWriter.WriteEndElement();
+
+                    // End the current cell's node
+                    xmlWriter.WriteEndElement();
+                }
+            }
+            xmlWriter.WriteEndElement(); // end spreadsheet node
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+        }
+
+        /// <summary>
+        /// Loads a spreadsheet stored in an XML file to the current spreadsheet.
+        /// All changes made prior to the loading will be removed.
+        /// </summary>
+        /// <param name="fileStream"> The incoming file </param>
+        /// <param name="spreadsheet"> The spreadsheet to load to </param>
+        public void Load(FileStream fileStream, Spreadsheet spreadsheet)
+        {
+            // Clear the undo and redo stacks.
+            undoStack.Clear();
+            redoStack.Clear();
+
+            // Necessary variables.
+            int rowIndex = 0;
+            int columnIndex = 0;
+            string cellText = "";
+            uint color = 0xFFFFFFFF;
+
+            using (XmlReader reader = XmlReader.Create(fileStream))
+            {
+                while (reader.Read())
+                {
+                    switch (reader.NodeType)
+                    {
+                        // Only process nodes that are elements.
+                        case XmlNodeType.Element:
+                            // Try-catch statement is used to safeguard bad cells (ex: A66) in XML file
+                            try
+                            {
+                                // Only process the necessary attributes and elements.
+                                // All unnecessary attributes and elements will be ignored.
+                                switch (reader.Name)
+                                {
+                                    // Get cell position
+                                    case "cell":
+                                        string cellName = reader.GetAttribute("name");
+                                        columnIndex = cellName[0] - 65;
+                                        rowIndex = Convert.ToInt32(cellName.Substring(1)) - 1;
+                                        break;
+
+                                    // Get cell text
+                                    case "text":
+                                        cellText = reader.ReadElementContentAsString();
+                                        spreadsheet.cellArray[rowIndex, columnIndex].Text = cellText;
+                                        break;
+
+                                    // Get cell background color.
+                                    case "bgcolor":
+                                        color = uint.Parse(reader.ReadElementContentAsString(), System.Globalization.NumberStyles.HexNumber);
+                                        spreadsheet.cellArray[rowIndex, columnIndex].BGColor = color;
+                                        break;
+                                }
+                                break;
+                            } catch (FormatException)
+                            {
+                                break;
+                            } catch (IndexOutOfRangeException)
+                            {
+                                break;
+                            }
+                    }
+                }
+            }
         }
     }
 }

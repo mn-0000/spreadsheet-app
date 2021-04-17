@@ -199,7 +199,7 @@ namespace CptS321
                     {
                         int rowNumber = 0;
                         rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
-                        int columnNumber = columnNumber = component[0] - 65;
+                        int columnNumber = component[0] - 65;
                         string cellValue = cellArray[rowNumber, columnNumber].Value;
                         constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
                         nodeStack.Push(constantNode);
