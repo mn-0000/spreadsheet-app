@@ -55,20 +55,23 @@ namespace Spreadsheet_Minh_Nguyen
                 }
                 else
                 {
+                    // If the cell's value is an error message, simply set the corresponding DataGridViewCell's value to such.
                     if (form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value.StartsWith("!"))
                     {
                         dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value;
                     }
                     else
                     {
+                        // Add the cell's dependents to the cell
                         form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].AddDependents(form1.userSpreadsheet);
-                        foreach (Cell dependentCell in form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Dependents)
-                            dependentCell.Update();
-
+                        
+                        // If the cell's value is positive infinity due to circular referencing, set the corresponding
+                        // DataGridViewCell's value to an error message indicating so.
                         if ((double.TryParse(form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value, out test) && Double.IsPositiveInfinity(Double.Parse(form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value))))
                         {
                             dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = "!(Circular reference)";
                         }
+                        // Otherwise, simply set the corresponding DataGridViewCell's value to such.
                         else
                         {
                             dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value;

@@ -187,8 +187,6 @@ namespace CptS321.Tests
             testSpreadsheet.cellArray[0, 1].AddDependents(testSpreadsheet);
             testSpreadsheet.cellArray[0, 1].Update();
             Assert.AreEqual(Double.PositiveInfinity.ToString(), testSpreadsheet.cellArray[0, 1].Value);
-        }
-
-        
+        }  
     }
 }

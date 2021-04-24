@@ -121,7 +121,6 @@ namespace CptS321
         /// </summary>
         public void Update()
         {
-            //List<Cell> sortedDependents = dependents.OrderByDescending(x => x.ColumnIndex).OrderByDescending(y => y.RowIndex).ToList();
             foreach (Cell cell in Dependents)
             {
                 if (cell.IsEventFired == true)
@@ -170,10 +169,14 @@ namespace CptS321
                             }
                             else
                             {
+                                // If there's circular referencing, set the cell's value to positive infinity.
                                 this.SetValue(Double.PositiveInfinity.ToString());
                             }
                         }
-                    } catch (FormatException)
+                    } 
+                    // If the "cell" to be added is actually out of range, set the current cell's value to an error message
+                    // notifying the user of an invalid reference.
+                    catch (FormatException)
                     {
                         this.SetValue("!(Invalid reference)");
                     }
