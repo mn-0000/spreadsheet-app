@@ -91,7 +91,7 @@ namespace CptS321.Tests
         public void TestInvalidReference()
         {
             testSpreadsheet.cellArray[0, 0].Text = "=X99";
-            Assert.AreEqual(Double.NaN, Double.Parse(testSpreadsheet.cellArray[0, 0].Value));
+            Assert.AreEqual("!(Invalid reference)", testSpreadsheet.cellArray[0, 0].Value);
         }
 
         /// <summary>
@@ -162,5 +162,33 @@ namespace CptS321.Tests
             Assert.AreEqual(10.ToString(), testSpreadsheet.cellArray[0, 1].Text);
             Assert.AreEqual(0xFFFFFFFF, testSpreadsheet.cellArray[0, 2].BGColor);
         }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the code correctly
+        /// identifies a cell referencing itself.
+        /// </summary>
+        [Test]
+        public void TestSelfReference()
+        {
+            testSpreadsheet.cellArray[0, 0].Text = "=A1";
+            Assert.AreEqual("!(Self-reference)", testSpreadsheet.cellArray[0, 0].Value);
+        }
+
+        /// <summary>
+        /// Test method for the Spreadsheet class, that checks whether the code correctly
+        /// identifies a circular reference between cells.
+        /// </summary>
+        [Test]
+        public void TestCircularReference()
+        {
+            testSpreadsheet.cellArray[0, 0].Text = "=B1";
+            testSpreadsheet.cellArray[0, 0].AddDependents(testSpreadsheet);
+            testSpreadsheet.cellArray[0, 1].Text = "=A1";
+            testSpreadsheet.cellArray[0, 1].AddDependents(testSpreadsheet);
+            testSpreadsheet.cellArray[0, 1].Update();
+            Assert.AreEqual(Double.PositiveInfinity.ToString(), testSpreadsheet.cellArray[0, 1].Value);
+        }
+
+        
     }
 }
