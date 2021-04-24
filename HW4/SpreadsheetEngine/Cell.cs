@@ -121,12 +121,13 @@ namespace CptS321
         /// </summary>
         public void Update()
         {
-            foreach (Cell cell in dependents)
+            //List<Cell> sortedDependents = dependents.OrderByDescending(x => x.ColumnIndex).OrderByDescending(y => y.RowIndex).ToList();
+            foreach (Cell cell in Dependents)
             {
                 if (cell.IsEventFired == true)
                 {
-                    OnPropertyChanged();
                     cell.IsEventFired = false;
+                    cell.OnPropertyChanged();
                 }
             }
         }
@@ -144,29 +145,38 @@ namespace CptS321
                 // If the component is a variable referring to a cell
                 if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
                 {
-                    // Get the cell's row number and column number
-                    int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
-                    int columnNumber = component[0] - 65;
-
-                    // Add the cell to the current cell's dependency list.
-                    dependents.Add(spreadsheet.cellArray[rowNumber, columnNumber]);
-
-                    // Also add all the cells that are dependent on each other to all depending cell's dependent lists.
-                    foreach (Cell cell in dependents)
+                    try
                     {
-                        if (!cell.Dependents.Contains(this))
-                        {
-                            cell.Dependents.Add(this);
-                        }
-                    }
-                    foreach (Cell dependentCell in spreadsheet.cellArray[rowNumber, columnNumber].Dependents)
-                    {
-                        if (!dependentCell.Dependents.Contains(this))
-                        {
-                            dependentCell.Dependents.Add(this);
-                        }
-                    }
+                        // Get the cell's row number and column number
+                        int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
+                        int columnNumber = component[0] - 65;
 
+                        // Add the cell to the current cell's dependency list.
+                        dependents.Add(spreadsheet.cellArray[rowNumber, columnNumber]);
+
+                        // Also add all the cells that are dependent on each other to all depending cell's dependent lists.
+                        foreach (Cell cell in dependents)
+                        {
+                            if (!cell.Dependents.Contains(this))
+                            {
+                                cell.Dependents.Add(this);
+                            }
+                        }
+                        foreach (Cell dependentCell in spreadsheet.cellArray[rowNumber, columnNumber].Dependents)
+                        {
+                            if (!this.Dependents.Contains(dependentCell))
+                            {
+                                this.Dependents.Add(dependentCell); 
+                            }
+                            else
+                            {
+                                this.SetValue(Double.PositiveInfinity.ToString());
+                            }
+                        }
+                    } catch (FormatException)
+                    {
+                        this.SetValue("!(Invalid reference)");
+                    }
                 }
             }
             // Updates all involved cells.
@@ -177,6 +187,12 @@ namespace CptS321
                     cell.IsEventFired = false;
                     cell.OnPropertyChanged();
                 }
+                foreach (Cell subcell in cell.Dependents)
+                    if (subcell.IsEventFired == true)
+                    {
+                        subcell.IsEventFired = false;
+                        subcell.OnPropertyChanged();
+                    }
             }
         }
     }

@@ -169,7 +169,7 @@ namespace CptS321
         /// </summary>
         /// <param name="cellArray"> The cell array of a spreadsheet </param>
         /// <returns> The result of the evaluation </returns>
-        public double EvaluateSpreadsheetFormula(Cell[,] cellArray)
+        public string EvaluateSpreadsheetFormula(Cell[,] cellArray, int cellRowIndex, int cellColumnIndex)
         {
             // needed variables
             string postfixExpression = ConvertToPostFix(rawExpression);
@@ -184,7 +184,7 @@ namespace CptS321
             foreach (string component in treeComponents)
             {
                 // If the incoming string is a parenthesis, the input is incorrect.
-                if ("()".Contains(component)) { return Double.NaN; }
+                if ("()".Contains(component)) { return "!(Unbalanced parentheses)"; }
                 // if the incoming string is a double, create a new constant node and push it to the stack.
                 if (double.TryParse(component, out test))
                 {
@@ -197,16 +197,23 @@ namespace CptS321
                 {
                     try
                     {
-                        int rowNumber = 0;
-                        rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
+                        int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
                         int columnNumber = component[0] - 65;
-                        string cellValue = cellArray[rowNumber, columnNumber].Value;
-                        constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
-                        nodeStack.Push(constantNode);
+                        if (rowNumber == cellRowIndex && columnNumber == cellColumnIndex)
+                        {
+                            return "!(Self-reference)";
+                        }
+                        else
+                        {
+                            string cellValue = cellArray[rowNumber, columnNumber].Value;
+                            constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
+                            nodeStack.Push(constantNode);
+                        }
                     }
                     catch (ArgumentNullException)
                     {
-                        return Double.NaN;
+                        constantNode = factory.CreateConstantNode(0);
+                        nodeStack.Push(constantNode);
                     }
                     catch (FormatException)
                     {
@@ -215,7 +222,7 @@ namespace CptS321
                     }
                     catch (IndexOutOfRangeException)
                     {
-                        return Double.NaN;
+                        return "!(Invalid reference)";
                     }
                 }
                 // else if the incoming string is an operator, create a new corresponding operator node, pops the last 2 nodes and have them
@@ -228,7 +235,7 @@ namespace CptS321
                     nodeStack.Push(operatorNode);
                 }
             }
-            return nodeStack.Peek().Evaluate(); // evaluates the tree and returns the result.
+            return nodeStack.Peek().Evaluate().ToString(); // evaluates the tree and returns the result.
         }
     }
 }

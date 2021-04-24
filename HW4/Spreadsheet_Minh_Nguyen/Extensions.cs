@@ -55,21 +55,24 @@ namespace Spreadsheet_Minh_Nguyen
                 }
                 else
                 {
-                    // If the formula is incorrect, notify the user with a MessageBox showing potential errors.
-                    if (Double.IsNaN(Double.Parse(form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value)))
+                    if (form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value.StartsWith("!"))
                     {
-                        MessageBox.Show("Your formula has an error. This could be due to the following reasons:" +
-                            "\n    - One or more cells you're referring to is invalid or currently empty." +
-                            "\n    - The number of opening and closing parentheses are not the same." +
-                            "\n    - There are no arguments in your formula." +
-                            "\nPlease try again!");
+                        dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value;
                     }
-                    // Otherwise, evaluate the formula and show the results.
                     else
                     {
                         form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].AddDependents(form1.userSpreadsheet);
-                        form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Update();
-                        dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value;
+                        foreach (Cell dependentCell in form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Dependents)
+                            dependentCell.Update();
+
+                        if ((double.TryParse(form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value, out test) && Double.IsPositiveInfinity(Double.Parse(form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value))))
+                        {
+                            dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = "!(Circular reference)";
+                        }
+                        else
+                        {
+                            dataGridView.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = form1.userSpreadsheet.cellArray[cell.RowIndex, cell.ColumnIndex].Value;
+                        }
                     }
                 }
                 return cell;
