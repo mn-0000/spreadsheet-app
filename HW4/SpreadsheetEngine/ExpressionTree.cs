@@ -168,8 +168,10 @@ namespace CptS321
         /// Evaluates the formula given by a spreadsheet's cell array.
         /// </summary>
         /// <param name="cellArray"> The cell array of a spreadsheet </param>
+        /// <param name="cellRowIndex"> The provided cell's row index </param>
+        /// <param name="cellColumnIndex"> The provided cell's column index </param>
         /// <returns> The result of the evaluation </returns>
-        public double EvaluateSpreadsheetFormula(Cell[,] cellArray)
+        public string EvaluateSpreadsheetFormula(Cell[,] cellArray, int cellRowIndex, int cellColumnIndex)
         {
             // needed variables
             string postfixExpression = ConvertToPostFix(rawExpression);
@@ -184,7 +186,7 @@ namespace CptS321
             foreach (string component in treeComponents)
             {
                 // If the incoming string is a parenthesis, the input is incorrect.
-                if ("()".Contains(component)) { return Double.NaN; }
+                if ("()".Contains(component)) { return "!(Unbalanced parentheses)"; }
                 // if the incoming string is a double, create a new constant node and push it to the stack.
                 if (double.TryParse(component, out test))
                 {
@@ -192,30 +194,41 @@ namespace CptS321
                     nodeStack.Push(constantNode);
                 }
                 // else if the incoming string is a variable name, create a new variable node and push it to the stack.
-                // returns Double.NaN if argument is null or out of range, 0 if argument is not a double.
                 else if (!double.TryParse(component, out test) && !"+-*/%^".Contains(component))
                 {
                     try
                     {
-                        int rowNumber = 0;
-                        rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
+                        int rowNumber = Convert.ToInt32(component.Substring(1)) - 1;
                         int columnNumber = component[0] - 65;
-                        string cellValue = cellArray[rowNumber, columnNumber].Value;
-                        constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
-                        nodeStack.Push(constantNode);
+                        // If the row and column number of the incoming cell reference matches that of the cell's,
+                        // return an error message notifying the user of self-referencing.
+                        if (rowNumber == cellRowIndex && columnNumber == cellColumnIndex)
+                        {
+                            return "!(Self-reference)";
+                        }
+                        else
+                        {
+                            string cellValue = cellArray[rowNumber, columnNumber].Value;
+                            constantNode = factory.CreateConstantNode(Double.Parse(cellValue));
+                            nodeStack.Push(constantNode);
+                        }
                     }
+                    // If the cell being referenced does not have a text value, or has a string value,
+                    // create a constant node of 0 and push it to the node stack.
                     catch (ArgumentNullException)
                     {
-                        return Double.NaN;
+                        constantNode = factory.CreateConstantNode(0);
+                        nodeStack.Push(constantNode);
                     }
                     catch (FormatException)
                     {
                         constantNode = factory.CreateConstantNode(0);
                         nodeStack.Push(constantNode);
                     }
+                    // If the incoming tree component is an invalid reference, return an error message notifying the user of such.
                     catch (IndexOutOfRangeException)
                     {
-                        return Double.NaN;
+                        return "!(Invalid reference)";
                     }
                 }
                 // else if the incoming string is an operator, create a new corresponding operator node, pops the last 2 nodes and have them
@@ -228,7 +241,7 @@ namespace CptS321
                     nodeStack.Push(operatorNode);
                 }
             }
-            return nodeStack.Peek().Evaluate(); // evaluates the tree and returns the result.
+            return nodeStack.Peek().Evaluate().ToString(); // evaluates the tree and returns the result.
         }
     }
 }

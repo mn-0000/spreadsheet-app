@@ -83,7 +83,7 @@ namespace CptS321
                 // Create a new expression tree with the given formula to access its methods.
                 ExpressionTree expressionTree = new ExpressionTree(cell.Text.Substring(1));
                 // Evaluates the formula, sets the value for the cell.
-                cellArray[cell.RowIndex, cell.ColumnIndex].SetValue(expressionTree.EvaluateSpreadsheetFormula(cellArray).ToString());
+                cellArray[cell.RowIndex, cell.ColumnIndex].SetValue(expressionTree.EvaluateSpreadsheetFormula(cellArray, cell.RowIndex, cell.ColumnIndex).ToString());
             }
 
             CellPropertyChanged(sender, e);
