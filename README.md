@@ -1,3 +1,1 @@
-Minh
-
-WSU ID#: 011741737
+Spreadsheet Simulation App
